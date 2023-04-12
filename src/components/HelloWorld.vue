@@ -32,15 +32,11 @@
     </ul>
   </div>
 </template>
+<script setup lang="ts">
+import { defineProps } from 'vue';
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'HelloWorld',
-  props: {
-    msg: String,
-  },
+defineProps({
+  msg: String,
 });
 </script>
 
