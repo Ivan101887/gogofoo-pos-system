@@ -9,7 +9,6 @@ module.exports = defineConfig({
   outputDir: '/dist',
   publicPath: '/',
   devServer: {
-    host: '192.168.1.103',
     port: 3000,
     open: true,
   },
