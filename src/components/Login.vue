@@ -45,19 +45,14 @@
 <script lang="ts">
 import axios from 'axios';
 import { reactive, ref, computed } from 'vue';
+import { loginPos } from '@/userRequest';
 
 export default {
   setup() {
     const loginInfo = reactive({ username: '', password: '' });
     const fnLogin = ():void => {
       console.log('這邊要登入');
-      axios.post(
-        'https://admin.gogofoo.com/accounts/login/',
-        { ...loginInfo },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
+      loginPos();
     };
     return {
       loginInfo,
