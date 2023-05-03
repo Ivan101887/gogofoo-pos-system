@@ -28,7 +28,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
   .item {
-    cursor: pointer;
-    @apply py-1 px-2;
+    @apply py-1 px-2 cursor-pointer;
   }
 </style>

@@ -1,5 +1,5 @@
 .btn {
-  @apply rounded;
+  @apply rounded cursor-pointer;
   &-md {
     @apply px-3;
   }
