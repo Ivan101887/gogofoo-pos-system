@@ -55,8 +55,8 @@
 
 <script lang="ts">
 import { reactive, ref } from 'vue';
-import { loginInfo as typeLoginInfo } from '../../entities';
 import { loginPos } from '@/userRequest';
+import { loginInfo as typeLoginInfo } from '../../entities';
 
 export default {
   props: {
