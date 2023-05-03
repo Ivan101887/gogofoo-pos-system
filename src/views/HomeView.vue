@@ -45,20 +45,19 @@ import {
 } from 'vue';
 import SearchList from '@/components/search/searchList.vue';
 import {
-  getProductWithSerialNumber,
-  getProductListWithName,
+  getSpecWithSerialNumber,
+  getSpecListWithName,
 } from '@/userRequest';
 import {
-  IProduct,
   IProductSpec,
 } from '../../entities';
 
-const productSerialRegex = /^SFPF\d{7,}-\d{1,2}/;
+const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
   setup() {
     const PDKeyword = ref<string>('');
-    // const timeout = ref<null | number>(null);
-    const productList = reactive<IProduct[]>([]);
+    const timeout = ref<null | number>(null);
+    const productList = reactive<IProductSpec[]>([]);
     const orderList = reactive<IProductSpec[]>([]);
     /**
      * 產品搜索
@@ -66,18 +65,31 @@ export default defineComponent({
      * @returns {void}
      */
     const getProductList = (): void => {
-      productList.splice(0, productList.length - 1);
+      // 搜尋前先清空陣列，以保證最終搜尋結果的正確性
+      productList.splice(0, productList.length);
+      // 如果沒有值就不搜尋了
       if (!PDKeyword.value) return;
+      /**
+       * 判斷是否為流水編號
+       *  -如果是流水編號就直接拿指定的商品
+       *  -反之就當成關鍵字搜尋相關商品
+       */
       if (productSerialRegex.test(PDKeyword.value.trim())) {
-        getProductWithSerialNumber(PDKeyword.value.trim());
+        getSpecWithSerialNumber(PDKeyword.value.trim())
+          .then((spec) => {
+            productList.push(spec.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       } else {
-        getProductListWithName({
+        getSpecListWithName({
           q: PDKeyword.value.trim(),
           limit: 10,
           page: 1,
         })
           .then((res) => {
-            productList.splice(0, productList.length - 1, ...res.data);
+            productList.push(...res.data);
           })
           .catch((err) => {
             console.log(err);
@@ -85,26 +97,25 @@ export default defineComponent({
       }
     };
     const handleKeyEvent = () => {
-      productList.splice(0, productList.length - 1);
-      // if (timeout.value) {
-      //   clearTimeout(timeout.value);
-      // }
-      getProductList();
-      // timeout.value = setTimeout(() => {
-      // }, 100);
+      // 輸入後都重新計時
+      if (timeout.value) {
+        clearTimeout(timeout.value);
+      }
+      // 為了避免每次都觸發，這邊透過定時器限制api呼叫次數，減少效能負擔
+      timeout.value = setTimeout(() => {
+        getProductList();
+      }, 500);
     };
-    watch(PDKeyword, (newValue, oldValue) => {
-      console.log(newValue);
-      if (productList.length) {
-        console.log(productList);
-        productList.splice(0, productList.length - 1);
-      }
-      if (!newValue || newValue === oldValue) {
-        return;
-      }
+    /** 監聽搜尋字串，有新的關鍵字就要重新搜尋 */
+    watch(PDKeyword, () => {
       handleKeyEvent();
     });
-    const addToCart = (product) => {
+    /**
+     * 加入訂單
+     * @param {IProductSpec} 欲加入訂單的商品資訊
+     * @return {void}
+     */
+    const addToCart = (product: IProductSpec) => {
       orderList.push(product);
     };
     return {
@@ -124,14 +135,14 @@ export default defineComponent({
   width: 100%;
   @apply flex flex-auto;
   &__head, &__body {
-    @apply w-[50%];
+    @apply w-1/2;
   }
 }
 .cashier {
   @apply relative;
   &__head {
-    @apply w-[100%] p-[10px] bg-[#D9D9D9];
-    @apply flex gap-[12px] items-end;
+    @apply w-full p-2.5 bg-[#D9D9D9];
+    @apply flex gap-3 items-end;
   }
   &__input, &__icon {
     display: block;
@@ -142,10 +153,10 @@ export default defineComponent({
   }
   &__search {
     display: block;
-    @apply flex items-center gap-[8px] grow;
+    @apply flex items-center gap-2 grow;
   }
   &__result {
-    @apply absolute top-[100%] bg-gray-50/50;
+    @apply absolute top-full;
   }
 }
 </style>
