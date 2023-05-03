@@ -56,6 +56,7 @@
 <script lang="ts">
 import { reactive, ref } from 'vue';
 import { loginInfo as typeLoginInfo } from '../../entities';
+import { loginPos } from '@/userRequest';
 
 export default {
   props: {
@@ -73,7 +74,8 @@ export default {
     const pwd = ref();
     const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
     const fnLogin = ():void => {
-      emit('login', loginInfo);
+      console.log('這邊要登入');
+      loginPos();
     };
     function fnFocusNext() {
       pwd.value.focus();

@@ -148,25 +148,5 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-.header {
-  @apply flex flex-auto justify-between items-center gap-[8px];
-  @apply px-[10px];
-  @apply bg-sky-600;
-  &__title {
-    @apply text-[40px] text-white font-black;
-  }
-  &__imgWrapper {
-    @apply bg-white rounded-lg;
-    width: 40px;
-    height: 40px;
-  }
-  &__img {
-    @apply block;
-    width: 100%;
-    height: auto;
-  }
-}
-.logo {
-  @apply flex flex-auto items-center gap-[8px];
-}
+
 </style>
