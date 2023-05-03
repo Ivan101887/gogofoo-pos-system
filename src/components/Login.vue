@@ -75,7 +75,7 @@ export default {
     const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
     const fnLogin = ():void => {
       console.log('這邊要登入');
-      loginPos();
+      emit('login', loginInfo);
     };
     function fnFocusNext() {
       pwd.value.focus();
