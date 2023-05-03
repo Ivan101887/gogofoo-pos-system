@@ -9,7 +9,6 @@ import {
 import type {
   ICustomer,
   IUser,
-  IProduct,
   IProductSpec,
   loginInfo as typeLoginInfo,
 } from '../entities';
