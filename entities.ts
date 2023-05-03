@@ -42,11 +42,3 @@ export interface IProductSpec {
   vendor: string,
   weight: number,
 }
-
-export interface IProduct {
-  id: string,
-  description: string,
-  images: string[],
-  name: string,
-  specs: IProductSpec[],
-}
