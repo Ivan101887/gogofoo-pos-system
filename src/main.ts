@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import App from './Index.vue';
-import router from './router';
+import router from './router/index';
 import store from './store';
 
 import '@/assets/scss/all.scss';
