@@ -6,10 +6,9 @@ import {
   logout,
   updateRequestHeader,
 } from '@/userRequest';
-import type {
+import {
   ICustomer,
   IUser,
-  IProductSpec,
   loginInfo as typeLoginInfo,
 } from '../entities';
 
@@ -147,5 +146,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-
+body {
+  @apply bg-[#f0f0f0];
+}
 </style>
