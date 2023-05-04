@@ -55,7 +55,6 @@
 
 <script lang="ts">
 import { reactive, ref } from 'vue';
-import { loginPos } from '@/userRequest';
 import { loginInfo as typeLoginInfo } from '../../entities';
 
 export default {
@@ -74,7 +73,6 @@ export default {
     const pwd = ref();
     const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
     const fnLogin = ():void => {
-      console.log('這邊要登入');
       emit('login', loginInfo);
     };
     function fnFocusNext() {
