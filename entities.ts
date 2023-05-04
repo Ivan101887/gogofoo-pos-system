@@ -42,3 +42,7 @@ export interface IProductSpec {
   vendor: string,
   weight: number,
 }
+export interface IShoppingItem extends IProductSpec {
+  buyCount: number,
+  pricePerUnit: number,
+}
