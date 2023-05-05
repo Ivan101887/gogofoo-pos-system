@@ -126,7 +126,6 @@ export default defineComponent({
     watch(PDKeyword, (value) => {
       isSearchError.value = false;
       if (value) {
-        console.log('hello world');
         isShowLoading.value = true;
       }
       // 輸入後都重新計時
@@ -154,12 +153,10 @@ export default defineComponent({
       if (index === -1) {
         shoppingList.push(shoppingItem);
       } else {
-        console.log('iii');
         shoppingList[index].buyCount += 1;
       }
       PDKeyword.value = '';
       productList.splice(0, productList.length);
-      console.log(index);
     };
     return {
       isShowLoading,
