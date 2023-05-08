@@ -36,14 +36,15 @@
           :shopping-list="shoppingList"
         />
       </div>
-      <div class="cashier__foot"></div>
+      <div class="cashier__foot">
+      </div>
     </section>
-    <div class="main__body">
+    <div class="main__body container">
       <section class="container__head">
         這邊要放會員搜尋
       </section>
       <section class="container__body">
-        這邊放常見商品
+        <Calculator />
       </section>
     </div>
   </div>
@@ -176,12 +177,15 @@ export default defineComponent({
 .main {
   width: 100%;
   @apply flex flex-auto;
-  &__head, &__body {
-    @apply w-1/2;
+  &__head{
+    @apply w-3/5
+  }
+  &__body {
+    @apply w-2/5;
   }
 }
 .cashier {
-  @apply relative;
+  @apply relative h-[calc(100vh-44px)];
   &__head {
     @apply w-full p-2.5 bg-[#D9D9D9];
     @apply flex gap-3 items-end;
@@ -198,7 +202,15 @@ export default defineComponent({
     @apply flex items-center gap-2 grow;
   }
   .result {
-    @apply absolute overflow-y-auto h-80 w-full top-full left-0;
+    @apply absolute overflow-y-auto h-80 w-full top-[48px] left-0;
+  }
+}
+.container {
+  &__head {
+    @apply h-2/5;
+  }
+  &__body {
+    @apply h-3/5;
   }
 }
 </style>
