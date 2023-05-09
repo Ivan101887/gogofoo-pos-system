@@ -1,5 +1,5 @@
 <template>
-  <div class="calculator">
+  <div class="calculator" @keyup.delete.capture="backspace">
     <div class="calculator__head">{{ displayValue }}</div>
 
     <div class="calculator__body">
@@ -27,10 +27,19 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineComponent } from 'vue';
+import {
+  ref, computed, defineComponent, watch,
+} from 'vue';
 
 export default defineComponent({
-  setup() {
+  props: {
+    target: {
+      type: String,
+      default: '',
+    },
+  },
+  emit: ['searchProduct'],
+  setup(props, { emit }) {
     const displayValue = ref<string>('0');
     const expression = ref<string>('');
     let shouldResetDisplay = false;
@@ -77,7 +86,16 @@ export default defineComponent({
       expression.value = '';
       shouldResetDisplay = true;
     };
-
+    watch(displayValue, (value: string) => {
+      let word = '';
+      if (value === '0') {
+        word = '';
+      } else {
+        word = value;
+      }
+      emit('searchProduct', word);
+      console.log(props.target);
+    });
     return {
       displayValue: computed(() => displayValue.value),
       clear,
@@ -87,6 +105,7 @@ export default defineComponent({
       appendOperator,
       appendDecimal,
       calculate,
+      emit,
     };
   },
 });

@@ -7,20 +7,16 @@
           <font-awesome-icon class="cashier__icon" :icon="['fas', 'magnifying-glass']" size="sm" />
           <input name="ProductId"
             v-model="PDKeyword"
+            ref="test"
             class="cashier__input"
             type="text"
             placeholder="商品名稱或編號"
-            @focus="isShowResult = true"
-            @blur="isShowResult = false"
+            @focus="focusOnEl"
+            @keyup="keyup"
           >
         </label>
-        <button
-          class="btn py-0.5 px-3 bg-sky-100 hover:bg-sky-200"
-          @click="handleKeyEvent"
-        >
-          輸入
-        </button>
         <div class="result">
+          <!-- 有輸入內容或是控制顯示的變數為true -->
           <SearchList
             v-show="isShowResult"
             class="cashier__result"
@@ -44,7 +40,7 @@
         這邊要放會員搜尋
       </section>
       <section class="container__body">
-        <Calculator />
+        <Calculator :target="target" @searchProduct="searchProduct"/>
       </section>
     </div>
   </div>
@@ -66,6 +62,10 @@ import {
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
   setup() {
+    const ele = ref<HTMLInputElement | null>(null);
+    const text = ref<string>('');
+    const test = ref();
+    const target = ref<string>('');
     const isShowLoading = ref<boolean>(false);
     const isShowResult = ref<boolean>(false);
     /** @param {string} PDKeyword 產品搜尋關鍵字 */
@@ -74,6 +74,34 @@ export default defineComponent({
     /** @param {number | null} 輸入事件的debounce定時器 */
     const timeout = ref<null | number>(null);
     const isSearchError = ref<boolean>(false);
+    const focusOnEl = (e) => {
+      console.log(e.target);
+      ele.value = e.target;
+    };
+    const callApi = (content: string) => {
+      switch (key) {
+        case value:
+          
+          break;
+      
+        default:
+          break;
+      }
+      // function(ele.value.value);
+    };
+    const keyup = (e) => {
+      callApi(e.target.value);
+    };
+    const searchProduct = (content: string) => {
+      // text.value = content;
+      // PDKeyword.value = content;
+      // test.value.focus();'
+      // if (ele.value) {
+      //   ele.value.value = content;
+      //   PDKeyword.value = content;
+      // }
+      callApi(content);
+    };
     /**
      * 產品搜索
      * @param keyword 搜索商品關鍵字
@@ -135,6 +163,9 @@ export default defineComponent({
       }
       // 為了避免每次都觸發，這邊透過定時器限制api呼叫次數，減少效能負擔
       timeout.value = setTimeout(() => {
+        // switch(ele.value){
+
+        // }
         getProductList();
       }, 100);
     });
@@ -167,6 +198,12 @@ export default defineComponent({
       addToCart,
       PDKeyword,
       isSearchError,
+      target,
+      searchProduct,
+      focusOnEl,
+      test,
+      ele,
+      keyup,
     };
   },
 });
