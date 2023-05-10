@@ -46,3 +46,21 @@ export interface IShoppingItem extends IProductSpec {
   buyCount: number,
   pricePerUnit: number,
 }
+
+// eslint-disable-next-line no-shadow
+export enum PaymentMethod {
+  CreditCard = '刷卡',
+  BankTransfer = '轉帳',
+  Cash = '現金',
+  Coupon = '購物金',
+  Credit = '抵用金',
+  Discount = '折扣',
+}
+
+// eslint-disable-next-line no-shadow
+export enum Operation {
+  Check = '結帳',
+  Discount = '折扣',
+  Modify = '更正',
+  Reset = '清除',
+}
