@@ -61,7 +61,7 @@
         </label>
       </section>
       <section class="container__body">
-        <Calculator />
+        <Calculator :target="ele" :now-value="nowValue" :update-value="inputFromPanel" />
       </section>
     </div>
   </div>
@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, ref, reactive, watch, Events,
+  defineComponent, ref, reactive,
 } from 'vue';
 import {
   getSpecWithSerialNumber,
@@ -91,14 +91,19 @@ type searchItem = {
 }
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
-  // const text = ref<string>('');
   setup() {
+    // ^元素操作
     /** @param {HTMLInputElement | null} ele 正在輸入的元素 */
     const ele = ref<HTMLInputElement | null>(null);
-    /** @param {HTMLInputElement} SearchProduct 商品搜尋框的virtual dom */
-    const SearchProduct = ref();
-    /** @param {HTMLInputElement} SearchUser 會員搜尋框的virtual dom */
-    const SearchUser = ref();
+    /**
+     * 紀錄當前要輸入的元素
+     * @param {Event} e 事件
+     */
+    const focusOnEl = (e: Event): void => {
+      ele.value = e.target as HTMLInputElement;
+    };
+
+    // ^搜尋功能
     /** 搜尋結果的控制項 */
     const searchController = reactive<searchItem>({
       Product: {
@@ -112,32 +117,18 @@ export default defineComponent({
         isSearchError: false,
       },
     });
-    /** @param {string} PDKeyword 產品搜尋關鍵字 */
-    const PDKeyword = ref<string>('');
+    /** @param {IProduct[]} productList 商品的搜尋結果 */
     const productList = reactive<IProductSpec[]>([]);
-    /** @param {number | null} 輸入事件的debounce定時器 */
-    const timeout = ref<null | number>(null);
-    /**
-     * 紀錄當前要輸入的元素
-     * @param {Event} e 事件
-     */
-    const focusOnEl = (e: Event): void => {
-      ele.value = e.target as HTMLInputElement;
-    };
-    /** 傳入計算機元件，透過面板更新輸入 */
-    const inputFromPanel = () => {
-      console.log('rrrrr');
-    };
     /**
      * 產品搜索
      * @param keyword 搜索商品關鍵字
      * @returns {void}
      */
-    const getProductList = async () => {
+    const getProductList = async (keyword: string) => {
       // 搜尋前先清空陣列，以保證最終搜尋結果的正確性
       productList.splice(0, productList.length);
       // 如果沒有值就不搜尋了
-      if (!PDKeyword.value) {
+      if (!keyword) {
         searchController.Product.isShowLoading = false;
         return;
       }
@@ -146,8 +137,8 @@ export default defineComponent({
        *  -如果是流水編號就直接拿指定的商品
        *  -反之就當成關鍵字搜尋相關商品
        */
-      if (productSerialRegex.test(PDKeyword.value.trim())) {
-        await getSpecWithSerialNumber(PDKeyword.value.trim())
+      if (productSerialRegex.test(keyword.trim())) {
+        await getSpecWithSerialNumber(keyword.trim())
           .then((spec) => {
             if (!spec.data.length) {
               searchController.Product.isSearchError = true;
@@ -160,7 +151,7 @@ export default defineComponent({
           });
       } else {
         await getSpecListWithName({
-          q: PDKeyword.value.trim(),
+          q: keyword.trim(),
           limit: 10,
           page: 1,
         })
@@ -177,10 +168,19 @@ export default defineComponent({
       }
       searchController.Product.isShowLoading = false;
     };
+
+    // ^控制api
+    /** @param {HTMLInputElement} SearchProduct 商品搜尋框的virtual dom */
+    const SearchProduct = ref();
+    /** @param {HTMLInputElement} SearchUser 會員搜尋框的virtual dom */
+    const SearchUser = ref();
+    /** @param {number | null} 輸入事件的debounce定時器 */
+    const timeout = ref<null | number>(null);
     /** 控制搜尋的api以及各項狀態的更新 */
     const apiHandler = (content: string) => {
       if (ele.value) {
         searchController[ele.value.name].isSearchError = false;
+        searchController[ele.value.name].isShowResult = true;
         if (content) {
           searchController[ele.value.name].isShowLoading = true;
         }
@@ -189,14 +189,16 @@ export default defineComponent({
       if (timeout.value) {
         clearTimeout(timeout.value);
       }
-      // 為了避免每次都觸發，這邊透過定時器限制api呼叫次數，減少效能負擔
-      timeout.value = setTimeout(() => {
-        getProductList();
-      }, 100);
       switch (ele.value) {
         case SearchProduct.value:
           if (content) {
             searchController.Product.isShowLoading = true;
+            // 為了避免每次都觸發，這邊透過定時器限制api呼叫次數，減少效能負擔
+            timeout.value = setTimeout(() => {
+              getProductList(content);
+            }, 100);
+          } else {
+            productList.splice(0, productList.length);
           }
           break;
         case SearchUser.value:
@@ -208,11 +210,27 @@ export default defineComponent({
           break;
       }
     };
+
+    // ^控制輸入
+    const nowValue = ref<string>('');
+    /** 傳入計算機元件，透過面板更新輸入 */
+    const inputFromPanel = (value: string) => {
+      if (ele.value) {
+        ele.value.value = value as string;
+        nowValue.value = ele.value.value as string;
+        apiHandler(ele.value.value);
+      }
+    };
     /** 鍵盤輸入呼叫指定api */
-    const onInput = (e) => {
-      console.log(e.target.value);
+    const onInput = () => {
+      if (ele.value) {
+        nowValue.value = ele.value.value;
+        apiHandler(ele.value.value);
+      }
       // apiHandler(e.target.value);
     };
+
+    // ^訂單操作
     const shoppingList = reactive<IShoppingItem[]>([]);
     /**
      * 加入訂單
@@ -231,7 +249,10 @@ export default defineComponent({
       } else {
         shoppingList[index].buyCount += 1;
       }
-      PDKeyword.value = '';
+      if (ele.value) {
+        ele.value.value = '';
+        nowValue.value = ele.value.value;
+      }
       productList.splice(0, productList.length);
     };
     return {
@@ -239,10 +260,10 @@ export default defineComponent({
       searchController,
       productList,
       shoppingList,
-      PDKeyword,
       SearchProduct,
       SearchUser,
       ele,
+      nowValue,
       // methods
       focusOnEl,
       addToCart,
