@@ -92,18 +92,6 @@ type searchItem = {
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
   setup() {
-    // ^元素操作
-    /** @param {HTMLInputElement | null} ele 正在輸入的元素 */
-    const ele = ref<HTMLInputElement | null>(null);
-    /**
-     * 紀錄當前要輸入的元素
-     * @param {Event} e 事件
-     */
-    const focusOnEl = (e: Event): void => {
-      ele.value = e.target as HTMLInputElement;
-    };
-
-    // ^搜尋功能
     /** 搜尋結果的控制項 */
     const searchController = reactive<searchItem>({
       Product: {
@@ -117,6 +105,25 @@ export default defineComponent({
         isSearchError: false,
       },
     });
+
+    // ^元素操作
+    /** @param {HTMLInputElement | null} ele 正在輸入的元素 */
+    const ele = ref<HTMLInputElement | null>(null);
+    /**
+     * 紀錄當前要輸入的元素
+     * @param {Event} e 事件
+     */
+    const focusOnEl = (e: Event): void => {
+      ele.value = e.target as HTMLInputElement;
+      Object.keys(searchController).forEach((item) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-param-reassign
+        searchController[item].isShowResult = false;
+        searchController[item].isShowLoading = false;
+        searchController[item].isShowError = false;
+      });
+    };
+
+    // ^搜尋功能
     /** @param {IProduct[]} productList 商品的搜尋結果 */
     const productList = reactive<IProductSpec[]>([]);
     /**
