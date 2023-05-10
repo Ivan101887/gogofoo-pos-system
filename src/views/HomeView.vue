@@ -1,46 +1,67 @@
 <!-- eslint-disable import/no-unresolved -->
 <template>
+  <!-- 主畫面 -->
   <div class="main">
+    <!-- 主畫面右半邊 -->
     <section class="main__head cashier">
       <div class="cashier__head">
-        <label for="ProductId" class="cashier__search">
+        <!-- 商品檢索的入框 -->
+        <label for="Product" class="cashier__search">
           <font-awesome-icon class="cashier__icon" :icon="['fas', 'magnifying-glass']" size="sm" />
-          <input name="ProductId"
-            v-model="PDKeyword"
-            ref="test"
+          <input
+            name="Product"
+            ref="SearchProduct"
             class="cashier__input"
             type="text"
             placeholder="商品名稱或編號"
+            @input="onInput"
             @focus="focusOnEl"
-            @keyup="keyup"
           >
         </label>
+        <!-- 商品檢索結果 -->
         <div class="result">
-          <!-- 有輸入內容或是控制顯示的變數為true -->
           <SearchList
-            v-show="isShowResult"
+            v-show="searchController.Product.isShowResult"
             class="cashier__result"
             :product-list="productList"
-            :is-show-loading="isShowLoading"
-            :is-search-error="isSearchError"
+            :is-show-loading="searchController.Product.isShowLoading"
+            :is-search-error="searchController.Product.isSearchError"
             @addToCart="addToCart"
           />
         </div>
       </div>
+      <!-- 當筆訂單的所購商品 -->
       <div class="cashier__body">
         <ShoppingList
           :shopping-list="shoppingList"
         />
       </div>
+      <!-- 結帳相關操作項 -->
       <div class="cashier__foot">
       </div>
     </section>
+    <!-- 主畫面右半邊 -->
     <div class="main__body container">
       <section class="container__head">
-        這邊要放會員搜尋
+        <label for="User" class="container__search">
+          <font-awesome-icon
+            class="container__icon"
+            :icon="['fas', 'magnifying-glass']"
+            size="sm"
+          />
+          <input
+            name="User"
+            ref="SearchUser"
+            class="cashier__input"
+            type="text"
+            placeholder="商品名稱或編號"
+            @keyup="onInput"
+            @focus="focusOnEl"
+          >
+        </label>
       </section>
       <section class="container__body">
-        <Calculator :target="target" @searchProduct="searchProduct"/>
+        <Calculator />
       </section>
     </div>
   </div>
@@ -48,7 +69,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, ref, reactive, watch,
+  defineComponent, ref, reactive, watch, Events,
 } from 'vue';
 import {
   getSpecWithSerialNumber,
@@ -59,48 +80,53 @@ import {
   IShoppingItem,
 } from '../../entities';
 
+type controller = {
+  isShowLoading: boolean,
+  isShowResult: boolean,
+  isSearchError: boolean,
+};
+type searchItem = {
+  Product: controller,
+  User: controller,
+}
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
+  // const text = ref<string>('');
   setup() {
+    /** @param {HTMLInputElement | null} ele 正在輸入的元素 */
     const ele = ref<HTMLInputElement | null>(null);
-    const text = ref<string>('');
-    const test = ref();
-    const target = ref<string>('');
-    const isShowLoading = ref<boolean>(false);
-    const isShowResult = ref<boolean>(false);
+    /** @param {HTMLInputElement} SearchProduct 商品搜尋框的virtual dom */
+    const SearchProduct = ref();
+    /** @param {HTMLInputElement} SearchUser 會員搜尋框的virtual dom */
+    const SearchUser = ref();
+    /** 搜尋結果的控制項 */
+    const searchController = reactive<searchItem>({
+      Product: {
+        isShowResult: false,
+        isShowLoading: false,
+        isSearchError: false,
+      },
+      User: {
+        isShowResult: false,
+        isShowLoading: false,
+        isSearchError: false,
+      },
+    });
     /** @param {string} PDKeyword 產品搜尋關鍵字 */
     const PDKeyword = ref<string>('');
     const productList = reactive<IProductSpec[]>([]);
     /** @param {number | null} 輸入事件的debounce定時器 */
     const timeout = ref<null | number>(null);
-    const isSearchError = ref<boolean>(false);
-    const focusOnEl = (e) => {
-      console.log(e.target);
-      ele.value = e.target;
+    /**
+     * 紀錄當前要輸入的元素
+     * @param {Event} e 事件
+     */
+    const focusOnEl = (e: Event): void => {
+      ele.value = e.target as HTMLInputElement;
     };
-    const callApi = (content: string) => {
-      switch (key) {
-        case value:
-          
-          break;
-      
-        default:
-          break;
-      }
-      // function(ele.value.value);
-    };
-    const keyup = (e) => {
-      callApi(e.target.value);
-    };
-    const searchProduct = (content: string) => {
-      // text.value = content;
-      // PDKeyword.value = content;
-      // test.value.focus();'
-      // if (ele.value) {
-      //   ele.value.value = content;
-      //   PDKeyword.value = content;
-      // }
-      callApi(content);
+    /** 傳入計算機元件，透過面板更新輸入 */
+    const inputFromPanel = () => {
+      console.log('rrrrr');
     };
     /**
      * 產品搜索
@@ -112,7 +138,7 @@ export default defineComponent({
       productList.splice(0, productList.length);
       // 如果沒有值就不搜尋了
       if (!PDKeyword.value) {
-        isShowLoading.value = false;
+        searchController.Product.isShowLoading = false;
         return;
       }
       /**
@@ -124,13 +150,13 @@ export default defineComponent({
         await getSpecWithSerialNumber(PDKeyword.value.trim())
           .then((spec) => {
             if (!spec.data.length) {
-              isSearchError.value = true;
+              searchController.Product.isSearchError = true;
             }
             productList.push(spec.data);
           })
           .catch((err) => {
             console.log(err);
-            isSearchError.value = true;
+            searchController.Product.isSearchError = true;
           });
       } else {
         await getSpecListWithName({
@@ -140,22 +166,24 @@ export default defineComponent({
         })
           .then((res) => {
             if (!res.data.length) {
-              isSearchError.value = true;
+              searchController.Product.isSearchError = true;
             }
             productList.push(...res.data);
           })
           .catch((err) => {
             console.log(err);
-            isSearchError.value = true;
+            searchController.Product.isSearchError = true;
           });
       }
-      isShowLoading.value = false;
+      searchController.Product.isShowLoading = false;
     };
-    /** 監聽搜尋字串，有新的關鍵字就要重新搜尋 */
-    watch(PDKeyword, (value) => {
-      isSearchError.value = false;
-      if (value) {
-        isShowLoading.value = true;
+    /** 控制搜尋的api以及各項狀態的更新 */
+    const apiHandler = (content: string) => {
+      if (ele.value) {
+        searchController[ele.value.name].isSearchError = false;
+        if (content) {
+          searchController[ele.value.name].isShowLoading = true;
+        }
       }
       // 輸入後都重新計時
       if (timeout.value) {
@@ -163,12 +191,28 @@ export default defineComponent({
       }
       // 為了避免每次都觸發，這邊透過定時器限制api呼叫次數，減少效能負擔
       timeout.value = setTimeout(() => {
-        // switch(ele.value){
-
-        // }
         getProductList();
       }, 100);
-    });
+      switch (ele.value) {
+        case SearchProduct.value:
+          if (content) {
+            searchController.Product.isShowLoading = true;
+          }
+          break;
+        case SearchUser.value:
+          if (content) {
+            searchController.User.isShowLoading = true;
+          }
+          break;
+        default:
+          break;
+      }
+    };
+    /** 鍵盤輸入呼叫指定api */
+    const onInput = (e) => {
+      console.log(e.target.value);
+      // apiHandler(e.target.value);
+    };
     const shoppingList = reactive<IShoppingItem[]>([]);
     /**
      * 加入訂單
@@ -191,19 +235,19 @@ export default defineComponent({
       productList.splice(0, productList.length);
     };
     return {
-      isShowLoading,
-      isShowResult,
+      // data
+      searchController,
       productList,
       shoppingList,
-      addToCart,
       PDKeyword,
-      isSearchError,
-      target,
-      searchProduct,
-      focusOnEl,
-      test,
+      SearchProduct,
+      SearchUser,
       ele,
-      keyup,
+      // methods
+      focusOnEl,
+      addToCart,
+      onInput,
+      inputFromPanel,
     };
   },
 });
