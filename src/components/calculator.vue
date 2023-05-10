@@ -1,111 +1,69 @@
 <template>
   <div class="calculator" @keyup.delete.capture="backspace">
-    <div class="calculator__head">{{ displayValue }}</div>
-
     <div class="calculator__body">
       <button class="btn" @click="clear">C</button>
-      <button class="btn" @click="clearEntry">CE</button>
+      <button class="btn" @click="clear">CE</button>
       <button class="btn" @click="backspace">←</button>
-      <button class="btn" @click="appendOperator('/')">/</button>
+      <button class="btn">/</button>
       <button class="btn" @click="appendNumber('7')">7</button>
       <button class="btn" @click="appendNumber('8')">8</button>
       <button class="btn" @click="appendNumber('9')">9</button>
-      <button class="btn" @click="appendOperator('*')">*</button>
+      <button class="btn">*</button>
       <button class="btn" @click="appendNumber('4')">4</button>
       <button class="btn" @click="appendNumber('5')">5</button>
       <button class="btn" @click="appendNumber('6')">6</button>
-      <button class="btn" @click="appendOperator('-')">-</button>
+      <button class="btn">-</button>
       <button class="btn" @click="appendNumber('1')">1</button>
       <button class="btn" @click="appendNumber('2')">2</button>
       <button class="btn" @click="appendNumber('3')">3</button>
-      <button class="btn" @click="appendOperator('+')">+</button>
+      <button class="btn">+</button>
       <button class="btn" @click="appendNumber('0')">0</button>
-      <button class="btn" @click="appendDecimal()">.</button>
-      <button class="btn btn__lg" @click="calculate()">=</button>
+      <button class="btn">.</button>
+      <button class="btn btn__lg">=</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import {
-  ref, computed, defineComponent, watch,
+  defineComponent,
 } from 'vue';
 
 export default defineComponent({
   props: {
-    target: {
+    /** @param {Function} updateValue 更新父層input值 */
+    updateValue: {
+      type: Function,
+      default: null,
+    },
+    /** @param {String} nowValue 更新前的值 */
+    nowValue: {
       type: String,
       default: '',
     },
+    /** @param {HTMLInputElement} target 父層要更新的元素 */
+    target: {
+      type: HTMLInputElement || null,
+      default: null,
+    },
   },
-  emit: ['searchProduct'],
-  setup(props, { emit }) {
-    const displayValue = ref<string>('0');
-    const expression = ref<string>('');
-    let shouldResetDisplay = false;
-
-    const clear = (): void => {
-      displayValue.value = '0';
-      expression.value = '';
-    };
-
-    const clearEntry = (): void => {
-      displayValue.value = '0';
-    };
-
+  setup(props) {
     const backspace = (): void => {
-      displayValue.value = displayValue.value.slice(0, -1) || '0';
+      const value = props.nowValue.slice(0, -1);
+      props.updateValue(value);
+    };
+    const clear = (): void => {
+      props.updateValue('');
     };
 
     const appendNumber = (num: string): void => {
-      if (shouldResetDisplay) {
-        displayValue.value = '';
-        shouldResetDisplay = false;
-      }
-      if (displayValue.value === '0') {
-        displayValue.value = '';
-      }
-      displayValue.value += num;
+      props.updateValue(props.nowValue + num);
     };
 
-    const appendOperator = (operator: string): void => {
-      expression.value += `${displayValue.value} ${operator} `;
-      shouldResetDisplay = true;
-    };
-
-    const appendDecimal = (): void => {
-      if (!displayValue.value.includes('.')) {
-        displayValue.value += '.';
-      }
-    };
-
-    const calculate = (): void => {
-      expression.value += displayValue.value;
-      // eslint-disable-next-line no-eval
-      displayValue.value = eval(expression.value);
-      expression.value = '';
-      shouldResetDisplay = true;
-    };
-    watch(displayValue, (value: string) => {
-      let word = '';
-      if (value === '0') {
-        word = '';
-      } else {
-        word = value;
-      }
-      emit('searchProduct', word);
-      console.log(props.target);
-    });
     return {
-      displayValue: computed(() => displayValue.value),
       clear,
-      clearEntry,
-      backspace,
       appendNumber,
-      appendOperator,
-      appendDecimal,
-      calculate,
-      emit,
+      backspace,
     };
   },
 });
