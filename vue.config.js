@@ -10,7 +10,6 @@ module.exports = defineConfig({
   publicPath: '/',
   devServer: {
     port: 3000,
-    open: true,
   },
   css: {
     loaderOptions: {
