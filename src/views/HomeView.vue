@@ -19,9 +19,8 @@
           >
         </label>
         <!-- 商品檢索結果 -->
-        <div class="result">
+        <div v-show="searchController.Product.isShowResult" class="result">
           <SearchList
-            v-show="searchController.Product.isShowResult"
             class="cashier__result"
             :product-list="productList"
             :is-show-loading="searchController.Product.isShowLoading"
@@ -54,7 +53,7 @@
             ref="SearchUser"
             class="cashier__input"
             type="text"
-            placeholder="商品名稱或編號"
+            placeholder="請輸入會員手機號碼"
             @keyup="onInput"
             @focus="focusOnEl"
           >
@@ -114,9 +113,11 @@ export default defineComponent({
      * @param {Event} e 事件
      */
     const focusOnEl = (e: Event): void => {
+      if (ele.value) {
+        ele.value.value = '';
+      }
       ele.value = e.target as HTMLInputElement;
       Object.keys(searchController).forEach((item) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-param-reassign
         searchController[item].isShowResult = false;
         searchController[item].isShowLoading = false;
         searchController[item].isShowError = false;
@@ -245,6 +246,7 @@ export default defineComponent({
      * @return {void}
      */
     const addToCart = (product: IProductSpec) => {
+      console.log('加入購物車');
       const shoppingItem: IShoppingItem = {
         ...product,
         buyCount: 1,
@@ -258,7 +260,9 @@ export default defineComponent({
       }
       if (ele.value) {
         ele.value.value = '';
+        searchController[ele.value.name].isShowResult = false;
         nowValue.value = ele.value.value;
+        ele.value.focus();
       }
       productList.splice(0, productList.length);
     };
@@ -311,7 +315,7 @@ export default defineComponent({
     @apply flex items-center gap-2 grow;
   }
   .result {
-    @apply absolute overflow-y-auto h-80 w-full top-[48px] left-0;
+    @apply absolute overflow-y-auto h-80 w-full top-[46px] left-0 bg-sky-50;
   }
 }
 .container {
