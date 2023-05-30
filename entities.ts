@@ -42,26 +42,23 @@ export interface IProductSpec {
   vendor: string,
   weight: number,
 }
-export interface IShoppingItem extends IProductSpec {
-  buyCount: number,
+export interface IShoppingItem {
+  product_name: string,
+  serial_number: string,
   purchase_count: number,
+  price_per_unit: number,
+  percentage_discount?: number,
+  amount_discount?: number,
 }
-export interface IOrderSpec {
-    'mobile'?: string,
-    'used_e_money'?: number,
-    'used_bonus'?: number,
-    'payment_method': 'cash' | 'card',
-    'percentage_discount'?: number,
-    'amount_discount'?: number,
-    'items': [
-      {
-        'serial_number': string,
-        'purchase_count': number,
-        'price_per_unit': number,
-        'percentage_discount'?: number,
-        'amount_discount'?: number,
-      }
-    ]
+
+export interface IOrderInfo {
+  mobile?: string,
+  used_e_money?: number,
+  used_bonus?: number,
+  payment_method: 'cash' | 'card',
+  percentage_discount?: number,
+  amount_discount?: number,
+  items: IShoppingItem[],
 }
 // eslint-disable-next-line no-shadow
 export enum PaymentMethod {
