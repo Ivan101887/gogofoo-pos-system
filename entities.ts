@@ -44,9 +44,25 @@ export interface IProductSpec {
 }
 export interface IShoppingItem extends IProductSpec {
   buyCount: number,
-  pricePerUnit: number,
+  purchase_count: number,
 }
-
+export interface IOrderSpec {
+    'mobile'?: string,
+    'used_e_money'?: number,
+    'used_bonus'?: number,
+    'payment_method': 'cash' | 'card',
+    'percentage_discount'?: number,
+    'amount_discount'?: number,
+    'items': [
+      {
+        'serial_number': string,
+        'purchase_count': number,
+        'price_per_unit': number,
+        'percentage_discount'?: number,
+        'amount_discount'?: number,
+      }
+    ]
+}
 // eslint-disable-next-line no-shadow
 export enum PaymentMethod {
   CreditCard = '刷卡',
