@@ -248,15 +248,19 @@ export default defineComponent({
     const addToCart = (product: IProductSpec) => {
       console.log('加入購物車');
       const shoppingItem: IShoppingItem = {
-        ...product,
-        buyCount: 1,
-        pricePerUnit: product.price_per_unit,
+        product_name: product.product_name + product.spec_name,
+        serial_number: product.serial_number,
+        purchase_count: 1,
+        price_per_unit: product.price_per_unit,
+        percentage_discount: 100,
+        amount_discount: 0,
       };
-      const index = shoppingList.findIndex((item) => item.id === shoppingItem.id);
+      const index = shoppingList
+        .findIndex((item) => item.serial_number === shoppingItem.serial_number);
       if (index === -1) {
         shoppingList.push(shoppingItem);
       } else {
-        shoppingList[index].buyCount += 1;
+        shoppingList[index].purchase_count += 1;
       }
       if (ele.value) {
         ele.value.value = '';
