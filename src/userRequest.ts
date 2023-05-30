@@ -2,10 +2,11 @@ import axios, { AxiosResponse } from 'axios';
 import { IUser, loginInfo } from '../entities';
 
 /** api的根路徑 */
-const domain = {
-  formal: 'https://admin.gogofoo.com',
-  envTest: 'http://dev-gogofoo.tky.one', // 測試環境的訂單系統
-};
+// const domain = {
+//   formal: 'https://admin.gogofoo.com',
+//   envTest: 'http://dev-gogofoo.tky.one', // 測試環境的訂單系統
+// };
+const domain = 'http://dev-gogofoo.tky.one';
 /** 取得登入狀態
  * @return localStorage中的token
  */
@@ -31,7 +32,7 @@ const headers: {Authorization: string} = {
  */
 function loginPos(info: loginInfo): Promise<AxiosResponse> {
   return axios.post(
-    `${domain.formal}/accounts/login/`,
+    `${domain}/accounts/login/`,
     info,
     {
       headers: { 'Content-Type': 'application/json' },
@@ -50,7 +51,7 @@ function updateRequestHeader(): void {
  */
 function logout(): Promise<AxiosResponse> {
   return axios.post(
-    `${domain.formal}/accounts/logout/`,
+    `${domain}/accounts/logout/`,
     null,
     { headers },
   );
@@ -62,7 +63,7 @@ function logout(): Promise<AxiosResponse> {
  */
 function getSpecWithSerialNumber(productId: string):Promise<AxiosResponse> {
   return axios.get(
-    `${domain.formal}/products/specs/serial_number/${productId}/`,
+    `${domain}/products/specs/serial_number/${productId}/`,
     { headers },
   );
 }
@@ -77,7 +78,7 @@ function getSpecListWithName(params: {
     page: number,
   }): Promise<AxiosResponse> {
   return axios.get(
-    `${domain.formal}/api/v1/products/specs/search/`,
+    `${domain}/api/v1/products/specs/search/`,
     {
       params,
       headers,
