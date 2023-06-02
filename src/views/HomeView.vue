@@ -19,7 +19,7 @@
           >
         </label>
         <!-- 商品檢索結果 -->
-        <div v-show="searchController.Product.isShowResult" class="result">
+        <div v-show="searchController.Product.isShowResult" class="result" @click.stop>
           <SearchList
             class="cashier__result"
             :product-list="productList"
@@ -122,7 +122,7 @@ export default defineComponent({
       });
     };
     onMounted(() => {
-      window.addEventListener('click', handleClick);
+      window.addEventListener('click', handleClick, false);
     });
 
     // ^元素操作
@@ -132,6 +132,7 @@ export default defineComponent({
      * @param {Event} e 事件
      */
     const focusOnEl = (e: Event): void => {
+      console.log('focus on', e.target);
       if (ele.value) {
         ele.value.value = '';
         nowValue.value = '';
@@ -251,6 +252,7 @@ export default defineComponent({
     /** 鍵盤輸入呼叫指定api */
     const onInput = () => {
       if (ele.value) {
+        console.log('ru8bj');
         nowValue.value = ele.value.value;
         apiHandler(nowValue.value);
       }
