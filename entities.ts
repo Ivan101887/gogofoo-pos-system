@@ -11,17 +11,17 @@ export interface ICustomer {
   postcode: number,
   address: string,
   mobile: string,
-  'four_bank_number': string,
-  'company_name': string|null,
-  'company_phone': string|null,
-  'tax_number': string,
-  'e_money': number,
-  'sales_bonus': number,
-  'added_promo_code': string,
-  'refer_customer_code': string,
-  'refer_sales_code': string,
-  'emoney_numerator': number,
-  'emoney_denominator': number,
+  four_bank_number: string,
+  company_name: string|null,
+  company_phone: string|null,
+  tax_number: string,
+  e_money: number,
+  sales_bonus: number,
+  added_promo_code: string,
+  refer_customer_code: string,
+  refer_sales_code: string,
+  emoney_numerator: number,
+  emoney_denominator: number,
 }
 
 export interface IUser {
@@ -69,11 +69,28 @@ export enum PaymentMethod {
   Credit = '抵用金',
   Discount = '折扣',
 }
-
 // eslint-disable-next-line no-shadow
 export enum Operation {
   Check = '結帳',
   Discount = '折扣',
   Modify = '更正',
   Reset = '清除',
+}
+export interface IOrderDetailed {
+  url: string,
+  name: string,
+  mobile: string,
+  postcode: number,
+  address: string,
+  date: string,
+  time: string,
+  item_count: number,
+  items_brief: string,
+  photo: string | null,
+  final_price: number,
+  status: string,
+  payment_method: string,
+  card_payment_info_url: string | null,
+  id: number,
+  latest_error_transaction: string | null,
 }

@@ -85,10 +85,34 @@ function getSpecListWithName(params: {
     },
   );
 }
+/**
+ * 透過日期回顧歷史訂單
+ * @param {object} params 搜尋商品需要的參數
+ * @returns axios請求的promise物件
+ */
+function getHistoryOrders(params?: {
+    sy: string,
+    sm: number,
+    sd: number,
+    ey: number,
+    em: number,
+    ed: number,
+    limit: number,
+    pagination: number,
+  }): Promise<AxiosResponse> {
+  return axios.get(
+    `${domain}/api/v1/orders`,
+    {
+      params,
+      headers,
+    },
+  );
+}
 export {
   loginPos,
   logout,
   getSpecListWithName,
+  getHistoryOrders,
   getSpecWithSerialNumber,
   updateRequestHeader,
 };
