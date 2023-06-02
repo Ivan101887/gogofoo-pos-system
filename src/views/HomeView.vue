@@ -68,7 +68,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, ref, reactive,
+  defineComponent, ref, reactive, onMounted,
 } from 'vue';
 import {
   getSpecWithSerialNumber,
@@ -104,10 +104,29 @@ export default defineComponent({
         isSearchError: false,
       },
     });
+    /** @param {String} nowValue 目前輸入框中的值 */
+    const nowValue = ref<string>('');
+    const ele = ref<HTMLInputElement | null>(null);
+    const handleClick = (event) => {
+      console.log(event);
+      if (event.target.tagName.toLowerCase() === 'input') return;
+      if (ele.value) {
+        ele.value.value = '';
+        nowValue.value = '';
+      }
+      ele.value = null;
+      Object.keys(searchController).forEach((item) => {
+        searchController[item].isShowResult = false;
+        searchController[item].isShowLoading = false;
+        searchController[item].isShowError = false;
+      });
+    };
+    onMounted(() => {
+      window.addEventListener('click', handleClick);
+    });
 
     // ^元素操作
     /** @param {HTMLInputElement | null} ele 正在輸入的元素 */
-    const ele = ref<HTMLInputElement | null>(null);
     /**
      * 紀錄當前要輸入的元素
      * @param {Event} e 事件
@@ -115,6 +134,7 @@ export default defineComponent({
     const focusOnEl = (e: Event): void => {
       if (ele.value) {
         ele.value.value = '';
+        nowValue.value = '';
       }
       ele.value = e.target as HTMLInputElement;
       Object.keys(searchController).forEach((item) => {
@@ -220,20 +240,19 @@ export default defineComponent({
     };
 
     // ^控制輸入
-    const nowValue = ref<string>('');
     /** 傳入計算機元件，透過面板更新輸入 */
     const inputFromPanel = (value: string) => {
       if (ele.value) {
         ele.value.value = value as string;
         nowValue.value = ele.value.value as string;
-        apiHandler(ele.value.value);
+        apiHandler(nowValue.value);
       }
     };
     /** 鍵盤輸入呼叫指定api */
     const onInput = () => {
       if (ele.value) {
         nowValue.value = ele.value.value;
-        apiHandler(ele.value.value);
+        apiHandler(nowValue.value);
       }
       // apiHandler(e.target.value);
     };

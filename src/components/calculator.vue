@@ -1,25 +1,25 @@
 <template>
   <div class="calculator" @keyup.delete.capture="backspace">
     <div class="calculator__body">
-      <button class="btn" @click="clear">C</button>
-      <button class="btn" @click="clear">CE</button>
-      <button class="btn" @click="backspace">←</button>
-      <button class="btn">/</button>
-      <button class="btn" @click="appendNumber('7')">7</button>
-      <button class="btn" @click="appendNumber('8')">8</button>
-      <button class="btn" @click="appendNumber('9')">9</button>
-      <button class="btn">*</button>
-      <button class="btn" @click="appendNumber('4')">4</button>
-      <button class="btn" @click="appendNumber('5')">5</button>
-      <button class="btn" @click="appendNumber('6')">6</button>
-      <button class="btn">-</button>
-      <button class="btn" @click="appendNumber('1')">1</button>
-      <button class="btn" @click="appendNumber('2')">2</button>
-      <button class="btn" @click="appendNumber('3')">3</button>
-      <button class="btn">+</button>
-      <button class="btn" @click="appendNumber('0')">0</button>
-      <button class="btn">.</button>
-      <button class="btn btn__lg">=</button>
+      <input type="button" value="C" class="btn" @click="clear">
+      <input type="button" value="CE" class="btn" @click="clear">
+      <input type="button" value="←" class="btn" @click="backspace">
+      <input type="button" value="/" class="btn">
+      <input type="button" value="7" class="btn" @click="appendNumber('7')">
+      <input type="button" value="8" class="btn" @click="appendNumber('8')">
+      <input type="button" value="9" class="btn" @click="appendNumber('9')">
+      <input type="button" value="*" class="btn">
+      <input type="button" value="4" class="btn" @click="appendNumber('4')">
+      <input type="button" value="5" class="btn" @click="appendNumber('5')">
+      <input type="button" value="6" class="btn" @click="appendNumber('6')">
+      <input type="button" value="-" class="btn">
+      <input type="button" value="1" class="btn" @click="appendNumber('1')">
+      <input type="button" value="2" class="btn" @click="appendNumber('2')">
+      <input type="button" value="3" class="btn" @click="appendNumber('3')">
+      <input type="button" value="+" class="btn">
+      <input type="button" value="0" class="btn" @click="appendNumber('0')">
+      <input type="button" value="." class="btn">
+      <input type="button" value="=" class="btn btn__lg">
     </div>
   </div>
 </template>
