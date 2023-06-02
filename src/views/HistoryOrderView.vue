@@ -1,27 +1,35 @@
 <template>
-  <div class="history">
-    <h1 class="text-center text-4xl">歷史訂單</h1>
+  <div class="title">
+    <h1 class="text-center text-4xl py-4">歷史訂單</h1>
   </div>
-  <table>
-    <tr>
-      <td>名稱</td>
-      <td>售價</td>
-      <td>數量</td>
-      <td>打折</td>
-      <td>折扣金額</td>
-      <td>項目小節</td>
-    </tr>
-    <tr>
-      <td>demo</td>
-      <td>300</td>
-      <td>2</td>
-      <td>
-        <div contenteditable="true">100</div>
-      </td>
-      <td>
-        <div contenteditable="true" @keyup.enter.prevent>100</div>
-      </td>
-      <td>{{ 300 * 2 * 0.8 - 100 }}</td>
-    </tr>
-  </table>
+  <section class="orderTable mt-5">
+    <OrderList :order-list="orders"/>
+  </section>
+
 </template>
+
+<script lang="ts">
+import OrderList from '@/components/order/OrderList.vue';
+import {
+  defineComponent, reactive, ref, computed,
+} from 'vue';
+
+export default defineComponent({
+  setup() {
+    const orders = reactive([]);
+    // ^pagination related
+    const nowPage = ref(1);
+    const limit = 15;
+    const paginationLength = computed(() => orders.length / limit || 1);
+    return {
+      orders,
+      nowPage,
+      paginationLength,
+    };
+  },
+  components: { OrderList },
+});
+</script>
+
+<style lang="scss" scoped>
+</style>
