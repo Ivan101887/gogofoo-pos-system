@@ -3,6 +3,38 @@
   <div class="head">
     <h1 class="text-center text-4xl py-4">歷史訂單</h1>
   </div>
+  <downloadCsv
+    :data="[
+      {
+        name: 'terry',
+        salary: 'annual',
+        hours: 'week',
+      },
+      {
+        name: 'terry',
+        salary: 'annual',
+        hours: 'week',
+      },
+      {
+        name: 'terry',
+        salary: 'annual',
+        hours: 'week',
+      },
+    ]"
+    :labels="{
+      name: 'name',
+      salary: 'salary',
+      hours: 'Hours/week'
+    }"
+    :separator-excel="true"
+    :name="'My_Custom_CSV_test'"
+  >
+    <!-- @success="val => handleSuccess(val)"
+    @error="val => handleError(val)" -->
+    <button class="teal button__custom">
+      <b>My custom button</b>
+    </button>
+</downloadCsv>
   <section class="body orderTable h-[83vh]">
     <OrderList :order-list="orders"/>
   </section>
