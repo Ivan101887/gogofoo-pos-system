@@ -66,14 +66,15 @@ export interface IShoppingItem {
   amount_discount?: number,
 }
 
-type ZEOR_TO_HUNDRED = NumericRange<CreateArrayWithLengthX<0>, 100>
+type ZERO_TO_HUNDRED = NumericRange<CreateArrayWithLengthX<0>, 100>
+type transaction_tool = 'cash' | 'card';
 
 export interface IOrderInfo {
   mobile?: string,
   used_e_money?: number,
   used_bonus?: number,
-  payment_method: 'cash' | 'card',
-  percentage_discount?: ZEOR_TO_HUNDRED,
+  payment_method: transaction_tool,
+  percentage_discount?: ZERO_TO_HUNDRED,
   amount_discount?: number,
   items: IShoppingItem[],
 }
