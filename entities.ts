@@ -1,4 +1,19 @@
 /* eslint-disable camelcase */
+type CreateArrayWithLengthX<
+    LENGTH extends number,
+    ACC extends unknown[] = [],
+
+> = ACC['length'] extends LENGTH
+    ? ACC
+    : CreateArrayWithLengthX<LENGTH, [...ACC, 1]>
+
+type NumericRange<
+START_ARR extends number[],
+END extends number,
+ACC extends number=never>=
+START_ARR['length'] extends END
+? ACC | END
+: NumericRange<[...START_ARR, 1], END, ACC | START_ARR['length']>
 
 export type loginInfo = {
   username: string;
@@ -51,12 +66,15 @@ export interface IShoppingItem {
   amount_discount?: number,
 }
 
+type ZERO_TO_HUNDRED = NumericRange<CreateArrayWithLengthX<0>, 100>
+type transaction_tool = 'cash' | 'card';
+
 export interface IOrderInfo {
   mobile?: string,
   used_e_money?: number,
   used_bonus?: number,
-  payment_method: 'cash' | 'card',
-  percentage_discount?: number,
+  payment_method: transaction_tool,
+  percentage_discount?: ZERO_TO_HUNDRED,
   amount_discount?: number,
   items: IShoppingItem[],
 }

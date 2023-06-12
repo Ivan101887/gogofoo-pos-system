@@ -4,6 +4,7 @@ import { createApp } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faMagnifyingGlass, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import JsonCSV from 'vue-json-csv';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import App from './Index.vue';
@@ -18,5 +19,6 @@ createApp(App)
   .use(VueAxios, axios)
   .use(store)
   .use(router)
+  .component('downloadCsv', JsonCSV)
   .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');
