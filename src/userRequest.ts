@@ -91,17 +91,13 @@ function getSpecListWithName(params: {
  * @returns axios請求的promise物件
  */
 function getHistoryOrders(params?: {
-    sy: string,
-    sm: number,
-    sd: number,
-    ey: number,
-    em: number,
-    ed: number,
+    start?: string | null,
+    end?: string | null,
     limit: number,
-    pagination: number,
+    offset: number,
   }): Promise<AxiosResponse> {
   return axios.get(
-    `${domain}/api/v1/orders`,
+    `${domain}/api/v1/orders/list`,
     {
       params,
       headers,
