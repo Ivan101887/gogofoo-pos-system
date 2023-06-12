@@ -94,21 +94,25 @@ export enum Operation {
   Modify = '更正',
   Reset = '清除',
 }
+export type orderItem = {
+  serial_number: string,
+  purchase_count: number,
+  price_per_unit: number,
+  percentage_discount: number,
+  amount_discount: number
+}
 export interface IOrderDetailed {
-  url: string,
+  id: number,
+  order_from_platform: string,
+  order_forged_by_account: number,
+  customer: number,
   name: string,
   mobile: string,
-  postcode: number,
-  address: string,
-  date: string,
-  time: string,
-  item_count: number,
-  items_brief: string,
-  photo: string | null,
-  final_price: number,
-  status: string,
   payment_method: string,
-  card_payment_info_url: string | null,
-  id: number,
-  latest_error_transaction: string | null,
+  payment_status: string,
+  customer_note: string,
+  date: string,
+  order_number: string,
+  auth_event: number,
+  items: orderItem[],
 }
