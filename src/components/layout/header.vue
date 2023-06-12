@@ -1,4 +1,3 @@
-<!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
 <template>
   <header class="header">
     <figure class="logo">
@@ -26,7 +25,7 @@
       </button>
       <ul
         v-show="isShowOptions"
-        class="header__optionList"
+        class="header__optionList bg-[#f0f0f0]"
       >
         <li class="header__optionItem" @click="fnLogout">登出</li>
       </ul>
@@ -78,7 +77,7 @@ export default defineComponent({
     @apply rounded-full bg-light w-6 h-6;
   }
   &__optionList {
-    @apply absolute p-1 top-[42px] right-[-10px] shadow shadow-slate-200;
+    @apply absolute p-1 top-[35px] right-[-10px] shadow shadow-slate-200;
   }
   &__optionItem {
     @apply bg-white w-[100px] py-0.5 text-center hover:bg-slate-300 cursor-pointer;
