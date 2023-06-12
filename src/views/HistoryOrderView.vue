@@ -28,8 +28,6 @@
     :separator-excel="true"
     :name="'My_Custom_CSV_test'"
   >
-    <!-- @success="val => handleSuccess(val)"
-    @error="val => handleError(val)" -->
     <button class="teal button__custom">
       <b>My custom button</b>
     </button>
@@ -67,15 +65,22 @@ export default defineComponent({
     // ^pagination related
     const nowPage = ref(1);
     const limit = 15;
+    const totalOrders = ref(0);
     const paginationLength = computed(
-      () => (orders.length / limit >= 1 ? orders.length / limit : 10),
+      () => ((totalOrders.value > limit ? totalOrders.value : limit) / limit),
     );
+    const options = {
+      start: null,
+      end: null,
+      limit,
+      offset: limit * (nowPage.value - 1),
+    };
     const pageNum = computed(() => Array.from(Array(paginationLength.value), (v, k) => k + 1));
     onMounted(() => {
-      console.log('fetching orders');
-      getHistoryOrders()
+      getHistoryOrders(options)
         .then((res) => {
-          orders.push(res.data);
+          orders.push(...res.data.items);
+          totalOrders.value = res.data.count;
         })
         .catch((err) => {
           console.log(err);
