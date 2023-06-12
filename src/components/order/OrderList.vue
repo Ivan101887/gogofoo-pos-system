@@ -12,7 +12,528 @@
       </tr>
     </thead>
     <tbody>
+      <!-- <tr
+        v-for="item in orderList"
+        :key="item.id"
+        class="hover:bg-cyan-50 even:bg-sky-50 odd:bg-white cursor-pointer"
+      >
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr> -->
       <tr class="hover:bg-cyan-50 even:bg-sky-50 odd:bg-white cursor-pointer">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
+          嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚
+        </td>
+        <td class="p-2" valign="middle" align="center">10</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">以結帳</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">2023/06/02 09:57</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">卡片</td>
+        <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">4000</td>
+      </tr>
+      <tr class="hover:bg-cyan-50 cursor-pointer even:bg-sky-50 odd:bg-white">
         <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">3123213</td>
         <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
           嚴選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚、選鮭魚選鮭魚

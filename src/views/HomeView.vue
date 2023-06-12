@@ -42,7 +42,7 @@
     <!-- 主畫面右半邊 -->
     <div class="main__body container">
       <section class="container__head">
-        <label for="User" class="container__search">
+        <label for="User" class="container__search flex items-center gap-2">
           <font-awesome-icon
             class="container__icon"
             :icon="['fas', 'magnifying-glass']"
@@ -108,7 +108,6 @@ export default defineComponent({
     const nowValue = ref<string>('');
     const ele = ref<HTMLInputElement | null>(null);
     const handleClick = (event) => {
-      console.log(event);
       if (event.target.tagName.toLowerCase() === 'input') return;
       if (ele.value) {
         ele.value.value = '';
@@ -153,7 +152,7 @@ export default defineComponent({
      * @param keyword 搜索商品關鍵字
      * @returns {void}
      */
-    const getProductList = async (keyword: string) => {
+    const getProductList = (keyword: string) => {
       // 搜尋前先清空陣列，以保證最終搜尋結果的正確性
       productList.splice(0, productList.length);
       // 如果沒有值就不搜尋了
@@ -167,7 +166,7 @@ export default defineComponent({
        *  -反之就當成關鍵字搜尋相關商品
        */
       if (productSerialRegex.test(keyword.trim())) {
-        await getSpecWithSerialNumber(keyword.trim())
+        getSpecWithSerialNumber(keyword.trim())
           .then((spec) => {
             if (!spec.data.length) {
               searchController.Product.isSearchError = true;
@@ -179,7 +178,7 @@ export default defineComponent({
             searchController.Product.isSearchError = true;
           });
       } else {
-        await getSpecListWithName({
+        getSpecListWithName({
           q: keyword.trim(),
           limit: 10,
           page: 1,
@@ -349,6 +348,9 @@ export default defineComponent({
   }
   &__body {
     @apply h-3/5;
+  }
+  &__search {
+    @apply p-2.5  bg-[#D9D9D9];
   }
 }
 </style>

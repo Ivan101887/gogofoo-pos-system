@@ -1,13 +1,12 @@
-// eslint-disable-next-line vuejs-accessibility/click-events-have-key-events
 <template>
   <div class="head">
-    <h1 class="text-center text-4xl py-4">歷史訂單</h1>
+    <h1 class="text-center text-4xl py-4 bg-sky-50 caret-transparent">歷史訂單</h1>
   </div>
-  <section class="body orderTable h-[83vh]">
-    <OrderList :order-list="orders"/>
+  <section class="body orderTable mb-2 h-[83vh] overflow-y-auto">
+    <OrderList  class="caret-transparent" :order-list="orders"/>
   </section>
   <div class="foot">
-    <ul class="ls flex justify-center gap-2">
+    <ul class="ls flex justify-center gap-2 caret-transparent">
       <li
         v-for="item in pageNum"
         :key="item"
@@ -25,20 +24,31 @@
 <script lang="ts">
 import OrderList from '@/components/order/OrderList.vue';
 import {
-  defineComponent, reactive, ref, computed,
+  defineComponent, reactive, ref, computed, onMounted,
 } from 'vue';
+import { getHistoryOrders } from '@/userRequest';
+import { IOrderDetailed } from '../../entities';
 
 export default defineComponent({
   setup() {
-    const orders = reactive([]);
+    const orders = reactive<IOrderDetailed[]>([]);
     // ^pagination related
     const nowPage = ref(1);
     const limit = 15;
     const paginationLength = computed(
       () => (orders.length / limit >= 1 ? orders.length / limit : 10),
     );
-    console.log(paginationLength.value);
     const pageNum = computed(() => Array.from(Array(paginationLength.value), (v, k) => k + 1));
+    onMounted(() => {
+      console.log('fetching orders');
+      getHistoryOrders()
+        .then((res) => {
+          orders.push(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
     return {
       orders,
       nowPage,
