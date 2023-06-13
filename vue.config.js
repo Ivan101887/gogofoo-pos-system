@@ -7,9 +7,18 @@ const { ElementPlusResolver } = require('unplugin-vue-components/resolvers');
 
 module.exports = defineConfig({
   outputDir: '/dist',
-  publicPath: '/',
+  // publicPath: '/',
   devServer: {
-    port: 3000,
+    port: 8080,
+    proxy: {
+      '': {
+        target: 'http://dev-gogofoo.tky.one/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^': '/',
+        },
+      },
+    },
   },
   css: {
     loaderOptions: {
