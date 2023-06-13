@@ -54,6 +54,7 @@
             class="cashier__input"
             type="text"
             placeholder="請輸入會員手機號碼"
+            inputmode="none"
             @keyup="onInput"
             @focus="focusOnEl"
           >
@@ -73,6 +74,7 @@ import {
 import {
   getSpecWithSerialNumber,
   getSpecListWithName,
+  getMember,
 } from '@/userRequest';
 import {
   IProductSpec,
@@ -123,7 +125,7 @@ export default defineComponent({
     onMounted(() => {
       window.addEventListener('click', handleClick, false);
     });
-
+    const memberInfo = ref({});
     // ^元素操作
     /** @param {HTMLInputElement | null} ele 正在輸入的元素 */
     /**
@@ -232,10 +234,14 @@ export default defineComponent({
         case SearchUser.value:
           if (content) {
             searchController.User.isShowLoading = true;
+            timeout.value = setTimeout(() => {
+              getMember({ phone: content });
+            }, 500);
+          } else {
+            memberInfo.value = {};
           }
           break;
-        default:
-          break;
+        //  no default
       }
     };
 
@@ -251,11 +257,9 @@ export default defineComponent({
     /** 鍵盤輸入呼叫指定api */
     const onInput = () => {
       if (ele.value) {
-        console.log('ru8bj');
         nowValue.value = ele.value.value;
         apiHandler(nowValue.value);
       }
-      // apiHandler(e.target.value);
     };
 
     // ^訂單操作
@@ -266,7 +270,6 @@ export default defineComponent({
      * @return {void}
      */
     const addToCart = (product: IProductSpec) => {
-      console.log('加入購物車');
       const shoppingItem: IShoppingItem = {
         product_name: product.product_name + product.spec_name,
         serial_number: product.serial_number,
