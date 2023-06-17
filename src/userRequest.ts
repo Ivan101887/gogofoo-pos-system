@@ -6,8 +6,7 @@ import { IUser, loginInfo } from '../entities';
 //   formal: 'https://admin.gogofoo.com',
 //   envTest: 'http://dev-gogofoo.tky.one', // 測試環境的訂單系統
 // };
-// const domain = 'http://dev-gogofoo.tky.one';
-const domain = '';
+const domain = 'http://dev-gogofoo.tky.one';
 /** 取得登入狀態
  * @return localStorage中的token
  */
@@ -71,7 +70,7 @@ function getSpecListWithName(params: {
   });
 }
 function getMember(params: { phone: string }): Promise<AxiosResponse> {
-  return axios.get(`/accounts/mobile/${params.phone}`, { headers });
+  return axios.get(`${domain}/accounts/mobile/${params.phone}`, { headers });
 }
 /**
  * 透過日期回顧歷史訂單
