@@ -81,7 +81,6 @@ export interface IOrderInfo {
 // eslint-disable-next-line no-shadow
 export enum PaymentMethod {
   CreditCard = '刷卡',
-  BankTransfer = '轉帳',
   Cash = '現金',
   Coupon = '購物金',
   Credit = '抵用金',
