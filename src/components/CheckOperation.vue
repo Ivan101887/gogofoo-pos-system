@@ -3,8 +3,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, emit } from 'vue';
-import { } from '../../entities';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   setup() {
