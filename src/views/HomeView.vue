@@ -2,7 +2,7 @@
 <template>
   <!-- 主畫面 -->
   <div class="main">
-    <!-- 主畫面右半邊 -->
+    <!-- 主畫面左半邊 -->
     <section class="main__head cashier">
       <div class="cashier__head">
         <!-- 商品檢索的入框 -->
@@ -16,7 +16,7 @@
             placeholder="商品名稱或編號"
             @input="onInput"
             @focus="focusOnEl"
-          >
+          />
         </label>
         <!-- 商品檢索結果 -->
         <div v-show="searchController.Product.isShowResult" class="result" @click.stop>
@@ -31,13 +31,12 @@
       </div>
       <!-- 當筆訂單的所購商品 -->
       <div class="cashier__body">
-        <ShoppingList
-          :shopping-list="shoppingList"
-        />
+        <ShoppingList :shopping-list="shoppingList" />
       </div>
       <!-- 結帳相關操作項 -->
-      <div class="cashier__foot">
-      </div>
+      <!-- <div class="cashier__foot">
+        <CheckOperation />
+      </div> -->
     </section>
     <!-- 主畫面右半邊 -->
     <div class="main__body container">
@@ -57,7 +56,7 @@
             inputmode="none"
             @keyup="onInput"
             @focus="focusOnEl"
-          >
+          />
         </label>
       </section>
       <section class="container__body">
@@ -71,25 +70,18 @@
 import {
   defineComponent, ref, reactive, onMounted,
 } from 'vue';
-import {
-  getSpecWithSerialNumber,
-  getSpecListWithName,
-  getMember,
-} from '@/userRequest';
-import {
-  IProductSpec,
-  IShoppingItem,
-} from '../../entities';
+import { getSpecWithSerialNumber, getSpecListWithName, getMember } from '@/userRequest';
+import { IProductSpec, IShoppingItem } from '../../entities';
 
 type controller = {
-  isShowLoading: boolean,
-  isShowResult: boolean,
-  isSearchError: boolean,
+  isShowLoading: boolean;
+  isShowResult: boolean;
+  isSearchError: boolean;
 };
 type searchItem = {
-  Product: controller,
-  User: controller,
-}
+  Product: controller;
+  User: controller;
+};
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
   setup() {
@@ -271,6 +263,7 @@ export default defineComponent({
      */
     const addToCart = (product: IProductSpec) => {
       const shoppingItem: IShoppingItem = {
+        id: product.id,
         product_name: product.product_name + product.spec_name,
         serial_number: product.serial_number,
         purchase_count: 1,
@@ -278,8 +271,9 @@ export default defineComponent({
         percentage_discount: 100,
         amount_discount: 0,
       };
-      const index = shoppingList
-        .findIndex((item) => item.serial_number === shoppingItem.serial_number);
+      const index = shoppingList.findIndex(
+        (item) => item.serial_number === shoppingItem.serial_number,
+      );
       if (index === -1) {
         shoppingList.push(shoppingItem);
       } else {
@@ -310,27 +304,32 @@ export default defineComponent({
     };
   },
 });
-
 </script>
 
 <style lang="scss" scoped>
 .main {
   width: 100%;
   @apply flex flex-auto;
-  &__head{
-    @apply w-3/5
+  &__head {
+    @apply w-3/5;
   }
   &__body {
     @apply w-2/5;
   }
 }
 .cashier {
-  @apply relative h-[calc(100vh-44px)];
+  @apply relative h-[calc(100vh-44px)] flex flex-col;
   &__head {
     @apply w-full p-2.5 bg-[#D9D9D9];
     @apply flex gap-3 items-end;
   }
-  &__input, &__icon {
+  &__body {
+  }
+  &__foot {
+    @apply flex w-full;
+  }
+  &__input,
+  &__icon {
     display: block;
   }
   &__input {

@@ -29,12 +29,12 @@ export interface ICustomer {
   four_bank_number: string,
   company_name: string|null,
   company_phone: string|null,
-  tax_number: string,
+  tax_number: string|null,
   e_money: number,
   sales_bonus: number,
-  added_promo_code: string,
-  refer_customer_code: string,
-  refer_sales_code: string,
+  added_promo_code: string|null,
+  refer_customer_code: string|null,
+  refer_sales_code: string|null,
   emoney_numerator: number,
   emoney_denominator: number,
 }
@@ -57,13 +57,16 @@ export interface IProductSpec {
   vendor: string,
   weight: number,
 }
-export interface IShoppingItem {
-  product_name: string,
-  serial_number: string,
+interface IOrderItem {
+  serial_number?: string,
   purchase_count: number,
-  price_per_unit: number,
+  price_per_unit?: number,
   percentage_discount?: number,
-  amount_discount?: number,
+  amount_discount?: number
+}
+export interface IShoppingItem extends IOrderItem{
+  id: number,
+  product_name: string,
 }
 
 type ZERO_TO_HUNDRED = NumericRange<CreateArrayWithLengthX<0>, 100>
@@ -93,13 +96,6 @@ export enum Operation {
   Modify = '更正',
   Reset = '清除',
 }
-export type orderItem = {
-  serial_number: string,
-  purchase_count: number,
-  price_per_unit: number,
-  percentage_discount: number,
-  amount_discount: number
-}
 export interface IOrderDetailed {
   id: number,
   order_from_platform: string,
@@ -113,5 +109,5 @@ export interface IOrderDetailed {
   date: string,
   order_number: string,
   auth_event: number,
-  items: orderItem[],
+  items: IOrderItem[],
 }

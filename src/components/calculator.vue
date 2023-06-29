@@ -1,9 +1,9 @@
 <template>
   <div class="calculator" @keyup.delete.capture="backspace">
     <div class="calculator__body">
-      <input type="button" value="C" class="btn" @click="clear">
+      <input type="button" value="清除" class="btn" @click="clear">
       <input type="button" value="CE" class="btn" @click="clear">
-      <input type="button" value="←" class="btn" @click="backspace">
+      <input type="button" value="更正" class="btn" @click="backspace">
       <input type="button" value="/" class="btn">
       <input type="button" value="7" class="btn" @click="appendNumber('7')">
       <input type="button" value="8" class="btn" @click="appendNumber('8')">
@@ -19,7 +19,7 @@
       <input type="button" value="+" class="btn">
       <input type="button" value="0" class="btn" @click="appendNumber('0')">
       <input type="button" value="." class="btn">
-      <input type="button" value="=" class="btn btn__lg">
+      <input type="button" value="結帳" class="btn btn__lg">
     </div>
   </div>
 </template>
