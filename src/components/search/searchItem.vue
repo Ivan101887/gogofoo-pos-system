@@ -1,5 +1,5 @@
 <template>
-  <div class="flex item hover:bg-gray-100">
+  <div class="flex hover:bg-gray-100 p-2 cursor-pointer">
     <p class="id"> {{ product.serial_number }}</p>
     <p class="name"> {{ product.product_name }}</p>
     <p class="spec">{{ product.spec_name }}</p>
@@ -27,7 +27,4 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-  .item {
-    @apply py-1 px-2 cursor-pointer;
-  }
 </style>

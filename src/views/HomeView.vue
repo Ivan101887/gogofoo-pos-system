@@ -1,146 +1,162 @@
-<!-- eslint-disable import/no-unresolved -->
 <template>
   <!-- 主畫面 -->
-  <div class="main">
+  <div class="main flex flex-auto w-full h-[calc(100vh-44px)]">
     <!-- 主畫面左半邊 -->
-    <section class="main__head cashier">
-      <div class="cashier__head">
-        <!-- 商品檢索的入框 -->
-        <label for="Product" class="cashier__search">
-          <font-awesome-icon class="cashier__icon" :icon="['fas', 'magnifying-glass']" size="sm" />
-          <input
-            name="Product"
-            ref="SearchProduct"
-            class="cashier__input"
-            type="text"
-            placeholder="商品名稱或編號"
-            @input="onInput"
-            @focus="focusOnEl"
-          />
-        </label>
-        <!-- 商品檢索結果 -->
-        <div v-show="searchController.Product.isShowResult" class="result" @click.stop>
-          <SearchList
-            class="cashier__result"
-            :product-list="productList"
-            :is-show-loading="searchController.Product.isShowLoading"
-            :is-search-error="searchController.Product.isSearchError"
-            @addToCart="addToCart"
-          />
-        </div>
+    <section class="main__head cashier relative flex flex-col w-3/5">
+      <div class="cashier__head p-2.5 bg-[#D9D9D9]">
+        <SearchInput
+          :searchItem="searchItemProduct"
+          :error-message="searchProductErrorMessage"
+          :is-show-loading="currentSearch.isShowLoading"
+          :is-search-error="currentSearch.isSearchError"
+          placeholder="商品名稱或編號"
+          :result="productList"
+          :fn-set-current="setCurrentSearch"
+          :fn-search="apiHandler"
+          @add-to-cart="addToCart"
+        >
+          <template v-slot:operate>
+            <button class="bg-blue-800 px-1 text-white" @click="checkAuthorization">
+              修改單價
+            </button>
+          </template>
+        </SearchInput>
       </div>
       <!-- 當筆訂單的所購商品 -->
       <div class="cashier__body">
-        <ShoppingList :shopping-list="shoppingList" />
+        <ShoppingList
+          :shopping-list="shoppingList"
+          :focus-on-el="setCurrentChange"
+          @removeItem="removeFromCart"
+        />
       </div>
-      <!-- 結帳相關操作項 -->
-      <!-- <div class="cashier__foot">
-        <CheckOperation />
-      </div> -->
     </section>
     <!-- 主畫面右半邊 -->
-    <div class="main__body container">
-      <section class="container__head">
-        <label for="User" class="container__search flex items-center gap-2">
-          <font-awesome-icon
-            class="container__icon"
-            :icon="['fas', 'magnifying-glass']"
-            size="sm"
-          />
-          <input
-            name="User"
-            ref="SearchUser"
-            class="cashier__input"
-            type="text"
-            placeholder="請輸入會員手機號碼"
-            inputmode="none"
-            @keyup="onInput"
-            @focus="focusOnEl"
-          />
-        </label>
+    <div class="main__body container relative flex flex-col w-2/5">
+      <section class="container__head bg-[#D9D9D9] p-2.5">
+        <SearchInput
+          :searchItem="searchItemUser"
+          :result="searchMember"
+          :is-show-loading="currentSearch.isShowLoading"
+          :is-search-error="currentSearch.isSearchError"
+          :error-message="searchUserErrorMessage"
+          placeholder="輸入手機號碼查詢會員資料"
+          :fn-set-current="setCurrentSearch"
+          :fn-search="apiHandler"
+          @set-order-member="setOrderMember"
+        />
       </section>
-      <section class="container__body">
-        <Calculator :target="ele" :now-value="nowValue" :update-value="inputFromPanel" />
+      <section class="container__body grow">
+        <OrderCustomer :customer="memberInfo" />
+      </section>
+      <section class="container__foot h-3/5">
+        <Calculator :now-value="currentSearch?.value || ''" :update-value="inputFromPanel" />
       </section>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  defineComponent, ref, reactive, onMounted,
-} from 'vue';
+import { defineComponent, ref, reactive } from 'vue';
 import { getSpecWithSerialNumber, getSpecListWithName, getMember } from '@/userRequest';
-import { IProductSpec, IShoppingItem } from '../../entities';
+import { IProductSpec, IShoppingItem, Customer } from '../../entities';
 
-type controller = {
+class SearchItem {
+  key: string;
+
+  value: string;
+
   isShowLoading: boolean;
+
   isShowResult: boolean;
+
   isSearchError: boolean;
-};
-type searchItem = {
-  Product: controller;
-  User: controller;
-};
+
+  constructor(
+    key = '',
+    value = '',
+    isShowLoading = false,
+    isSearchError = false,
+    isShowResult = false,
+  ) {
+    this.value = value;
+    this.key = key;
+    this.isSearchError = isSearchError;
+    this.isShowResult = isShowResult;
+    this.isShowLoading = isShowLoading;
+  }
+}
+// eslint-disable-next-line no-shadow
+enum searchKey {
+  product = 'product',
+  user = 'user',
+}
+const noticeText = '輸入完整手機以查詢';
+const phoneRegex = /^09\d{8}$/;
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
   setup() {
-    /** 搜尋結果的控制項 */
-    const searchController = reactive<searchItem>({
-      Product: {
-        isShowResult: false,
-        isShowLoading: false,
-        isSearchError: false,
-      },
-      User: {
-        isShowResult: false,
-        isShowLoading: false,
-        isSearchError: false,
-      },
-    });
-    /** @param {String} nowValue 目前輸入框中的值 */
-    const nowValue = ref<string>('');
-    const ele = ref<HTMLInputElement | null>(null);
+    /** 會員搜尋 */
+    const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
+    const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
+    const currentChange = ref<IShoppingItem>(new IShoppingItem());
+    const currentSearch = ref<SearchItem>(new SearchItem());
+    const currentKey = ref<string>('');
+    const recoverCurrentSearch = (): void => {
+      currentSearch.value.key = '';
+      currentSearch.value.value = '';
+      currentSearch.value.isShowResult = false;
+      currentSearch.value.isShowLoading = false;
+      currentSearch.value.isSearchError = false;
+    };
+    const recoverCurrentChange = (): void => {
+      currentChange.value = new IShoppingItem();
+      currentKey.value = '';
+    };
     const handleClick = (event) => {
-      if (event.target.tagName.toLowerCase() === 'input') return;
-      if (ele.value) {
-        ele.value.value = '';
-        nowValue.value = '';
-      }
-      ele.value = null;
-      Object.keys(searchController).forEach((item) => {
-        searchController[item].isShowResult = false;
-        searchController[item].isShowLoading = false;
-        searchController[item].isShowError = false;
-      });
+      // if (event.target.tagName.toLowerCase() === 'input') return;
+      // if (ele.value) {
+      //   ele.value.value = '';
+      //   nowValue.value = '';
+      // }
+      // ele.value = null;
+      // Object.keys(searchController).forEach((item) => {
+      //   searchController[item].isShowResult = false;
+      //   searchController[item].isShowLoading = false;
+      //   searchController[item].isShowError = false;
+      // });
     };
-    onMounted(() => {
-      window.addEventListener('click', handleClick, false);
-    });
-    const memberInfo = ref({});
+    // onMounted(() => {
+    //   window.addEventListener('click', handleClick, false);
+    // });
+    /** 訂單的會員資訊 */
+    const memberInfo = ref<Customer>(new Customer());
     // ^元素操作
-    /** @param {HTMLInputElement | null} ele 正在輸入的元素 */
-    /**
-     * 紀錄當前要輸入的元素
-     * @param {Event} e 事件
-     */
-    const focusOnEl = (e: Event): void => {
-      console.log('focus on', e.target);
-      if (ele.value) {
-        ele.value.value = '';
-        nowValue.value = '';
-      }
-      ele.value = e.target as HTMLInputElement;
-      Object.keys(searchController).forEach((item) => {
-        searchController[item].isShowResult = false;
-        searchController[item].isShowLoading = false;
-        searchController[item].isShowError = false;
-      });
-    };
-
     // ^搜尋功能
     /** @param {IProduct[]} productList 商品的搜尋結果 */
     const productList = reactive<IProductSpec[]>([]);
+    const searchMember = ref<Customer>(new Customer());
+    const setCurrentSearch = (item) => {
+      if (currentSearch.value.key !== item.key) {
+        switch (item.key) {
+          case searchKey.product:
+            productList.splice(0, productList.length);
+            break;
+          case searchKey.user:
+            searchMember.value = new Customer();
+            break;
+          // no default
+        }
+        recoverCurrentSearch();
+      }
+      currentSearch.value = item as SearchItem;
+    };
+    const setCurrentChange = (item, key = ''): void => {
+      console.log('set current change');
+      currentChange.value = item as IShoppingItem;
+      currentKey.value = key as string;
+    };
+    const searchProductErrorMessage = ref<string>('請掃描條碼或輸入商品名稱');
     /**
      * 產品搜索
      * @param keyword 搜索商品關鍵字
@@ -151,7 +167,7 @@ export default defineComponent({
       productList.splice(0, productList.length);
       // 如果沒有值就不搜尋了
       if (!keyword) {
-        searchController.Product.isShowLoading = false;
+        currentSearch.value.isShowLoading = false;
         return;
       }
       /**
@@ -163,13 +179,15 @@ export default defineComponent({
         getSpecWithSerialNumber(keyword.trim())
           .then((spec) => {
             if (!spec.data.length) {
-              searchController.Product.isSearchError = true;
+              searchProductErrorMessage.value = '找不到相關的商品';
+              currentSearch.value.isSearchError = true;
             }
             productList.push(spec.data);
           })
           .catch((err) => {
             console.log(err);
-            searchController.Product.isSearchError = true;
+            searchProductErrorMessage.value = '找不到相關的商品';
+            currentSearch.value.isSearchError = true;
           });
       } else {
         getSpecListWithName({
@@ -179,89 +197,91 @@ export default defineComponent({
         })
           .then((res) => {
             if (!res.data.length) {
-              searchController.Product.isSearchError = true;
+              searchProductErrorMessage.value = '找不到相關的商品';
+              currentSearch.value.isSearchError = false;
+              return;
             }
             productList.push(...res.data);
           })
           .catch((err) => {
             console.log(err);
-            searchController.Product.isSearchError = true;
+            searchProductErrorMessage.value = '找不到相關的商品';
+            currentSearch.value.isSearchError = true;
           });
       }
-      searchController.Product.isShowLoading = false;
+      currentSearch.value.isShowLoading = false;
+    };
+    const searchUserErrorMessage = ref<string>(noticeText);
+    const getCustomerData = (keyword) => {
+      if (phoneRegex.test(keyword)) {
+        getMember({ phone: keyword })
+          .then((res) => {
+            searchMember.value = res.data;
+            searchUserErrorMessage.value = '';
+            currentSearch.value.isSearchError = false;
+            currentSearch.value.isShowLoading = false;
+          })
+          .catch((err) => {
+            searchUserErrorMessage.value = err.response.data;
+            currentSearch.value.isShowLoading = false;
+            currentSearch.value.isSearchError = true;
+          });
+      }
     };
 
     // ^控制api
-    /** @param {HTMLInputElement} SearchProduct 商品搜尋框的virtual dom */
-    const SearchProduct = ref();
-    /** @param {HTMLInputElement} SearchUser 會員搜尋框的virtual dom */
-    const SearchUser = ref();
     /** @param {number | null} 輸入事件的debounce定時器 */
     const timeout = ref<null | number>(null);
     /** 控制搜尋的api以及各項狀態的更新 */
-    const apiHandler = (content: string) => {
-      if (ele.value) {
-        searchController[ele.value.name].isSearchError = false;
-        searchController[ele.value.name].isShowResult = true;
-        if (content) {
-          searchController[ele.value.name].isShowLoading = true;
+    const apiHandler = (content: SearchItem) => {
+      if (content.value) {
+        if (content.key === searchKey.product) {
+          searchProductErrorMessage.value = '請掃描條碼或輸入商品名稱';
+        } else {
+          searchUserErrorMessage.value = noticeText;
         }
       }
       // 輸入後都重新計時
       if (timeout.value) {
         clearTimeout(timeout.value);
       }
-      switch (ele.value) {
-        case SearchProduct.value:
-          if (content) {
-            searchController.Product.isShowLoading = true;
-            // 為了避免每次都觸發，這邊透過定時器限制api呼叫次數，減少效能負擔
-            timeout.value = setTimeout(() => {
-              getProductList(content);
-            }, 100);
-          } else {
-            productList.splice(0, productList.length);
-          }
-          break;
-        case SearchUser.value:
-          if (content) {
-            searchController.User.isShowLoading = true;
-            timeout.value = setTimeout(() => {
-              getMember({ phone: content });
-            }, 500);
-          } else {
-            memberInfo.value = {};
-          }
-          break;
-        //  no default
-      }
+      timeout.value = setTimeout(() => {
+        if (content.key === searchKey.product) {
+          getProductList(content.value);
+        } else {
+          getCustomerData(content.value);
+        }
+      }, 500);
     };
 
     // ^控制輸入
     /** 傳入計算機元件，透過面板更新輸入 */
+    const shoppingList = reactive<IShoppingItem[]>([]);
     const inputFromPanel = (value: string) => {
-      if (ele.value) {
-        ele.value.value = value as string;
-        nowValue.value = ele.value.value as string;
-        apiHandler(nowValue.value);
+      if (currentKey.value) {
+        console.log(1111);
+        const idx = shoppingList.findIndex(
+          (item) => item.id === currentChange.value.id,
+        );
+        console.log(idx);
+        if (idx !== -1) {
+          shoppingList[idx][currentKey.value] = value;
+        }
+        return;
       }
-    };
-    /** 鍵盤輸入呼叫指定api */
-    const onInput = () => {
-      if (ele.value) {
-        nowValue.value = ele.value.value;
-        apiHandler(nowValue.value);
+      if (currentSearch.value) {
+        currentSearch.value.value = value as string;
       }
     };
 
     // ^訂單操作
-    const shoppingList = reactive<IShoppingItem[]>([]);
     /**
      * 加入訂單
      * @param {IProductSpec} 欲加入訂單的商品資訊
      * @return {void}
      */
     const addToCart = (product: IProductSpec) => {
+      console.log(product);
       const shoppingItem: IShoppingItem = {
         id: product.id,
         product_name: product.product_name + product.spec_name,
@@ -271,6 +291,7 @@ export default defineComponent({
         percentage_discount: 100,
         amount_discount: 0,
       };
+      console.log(shoppingItem);
       const index = shoppingList.findIndex(
         (item) => item.serial_number === shoppingItem.serial_number,
       );
@@ -279,80 +300,47 @@ export default defineComponent({
       } else {
         shoppingList[index].purchase_count += 1;
       }
-      if (ele.value) {
-        ele.value.value = '';
-        searchController[ele.value.name].isShowResult = false;
-        nowValue.value = ele.value.value;
-        ele.value.focus();
+      recoverCurrentSearch();
+    };
+    const removeFromCart = (id: number) => {
+      const index = shoppingList.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        shoppingList.splice(index, 1);
       }
-      productList.splice(0, productList.length);
+    };
+    const setOrderMember = (member: Customer) => {
+      console.log(member);
+      memberInfo.value = member;
+      recoverCurrentSearch();
+      searchUserErrorMessage.value = noticeText;
+      searchMember.value = new Customer();
+    };
+    const checkAuthorization = () => {
+      console.log('這邊需要做權限驗證');
     };
     return {
       // data
-      searchController,
+      searchItemProduct,
+      searchItemUser,
       productList,
       shoppingList,
-      SearchProduct,
-      SearchUser,
-      ele,
-      nowValue,
+      searchMember,
+      searchProductErrorMessage,
+      searchUserErrorMessage,
+      memberInfo,
+      currentSearch,
+      currentChange,
+      currentKey,
       // methods
-      focusOnEl,
+      apiHandler,
       addToCart,
-      onInput,
+      checkAuthorization,
       inputFromPanel,
+      setOrderMember,
+      removeFromCart,
+      setCurrentSearch,
+      setCurrentChange,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.main {
-  width: 100%;
-  @apply flex flex-auto;
-  &__head {
-    @apply w-3/5;
-  }
-  &__body {
-    @apply w-2/5;
-  }
-}
-.cashier {
-  @apply relative h-[calc(100vh-44px)] flex flex-col;
-  &__head {
-    @apply w-full p-2.5 bg-[#D9D9D9];
-    @apply flex gap-3 items-end;
-  }
-  &__body {
-  }
-  &__foot {
-    @apply flex w-full;
-  }
-  &__input,
-  &__icon {
-    display: block;
-  }
-  &__input {
-    @apply bg-transparent grow border-b-2 border-neutral-400;
-    outline: none;
-  }
-  &__search {
-    display: block;
-    @apply flex items-center gap-2 grow;
-  }
-  .result {
-    @apply absolute overflow-y-auto h-80 w-full top-[46px] left-0 bg-sky-50;
-  }
-}
-.container {
-  &__head {
-    @apply h-2/5;
-  }
-  &__body {
-    @apply h-3/5;
-  }
-  &__search {
-    @apply p-2.5  bg-[#D9D9D9];
-  }
-}
-</style>

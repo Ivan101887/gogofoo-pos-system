@@ -94,7 +94,4 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-td {
-  vertical-align: middle;
-}
 </style>

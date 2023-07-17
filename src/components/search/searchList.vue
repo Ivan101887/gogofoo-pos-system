@@ -2,13 +2,13 @@
   <div v-if="isShowLoading" class="load">
     <Loading />
   </div>
-  <ul  v-else-if="productList.length" class="list">
-    <li v-for="item in productList" :key="item.id" class="item">
+  <ul  v-else-if="result.length" class="list">
+    <li v-for="item in result" :key="item.id" class="item">
       <SearchItem :product="item" @click="addToCart(item)"/>
     </li>
   </ul>
   <div v-else class="notify">
-    {{ isSearchError ? '找不到此商品' : '掃描或輸入欲結帳的商品'}}
+    {{ errorMessage }}
   </div>
 </template>
 
@@ -18,25 +18,33 @@ import type { IProductSpec } from '../../../entities';
 
 export default defineComponent({
   props: {
-    productList: {
+    /** @params {String} errorMessage - 錯誤訊息 */
+    errorMessage: {
+      type: String,
+      default: '請掃描條碼或輸入商品名稱',
+    },
+    /** @params {Array} result -  搜尋結果 */
+    result: {
       type: Array as PropType<IProductSpec[]>,
       default: () => [],
     },
+    /** @params {Boolean} isShowLoading - 搜尋的loading畫面 */
     isShowLoading: {
       type: Boolean,
       default: true,
     },
+    /** @params {Boolean} isSearchError - 搜尋失敗狀態 */
     isSearchError: {
       type: Boolean,
       default: false,
     },
   },
   setup(props, { emit }) {
+    /** 加入購物車 */
     const addToCart = (product: IProductSpec) => {
       emit('addToCart', product);
     };
     return {
-      emit,
       addToCart,
     };
   },

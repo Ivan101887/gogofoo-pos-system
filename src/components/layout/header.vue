@@ -78,6 +78,7 @@ export default defineComponent({
   }
   &__optionList {
     @apply absolute p-1 top-[35px] right-[-10px] shadow shadow-slate-200;
+    z-index: 2;
   }
   &__optionItem {
     @apply bg-white w-[100px] py-0.5 text-center hover:bg-slate-300 cursor-pointer;

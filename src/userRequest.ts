@@ -29,7 +29,7 @@ const headers: { Authorization: string } = {
  * @returns axios請求的promise物件
  */
 function loginPos(info: loginInfo): Promise<AxiosResponse> {
-  return axios.post(`${domain}/accounts/login/`, info, {
+  return axios.post(`${domain}/accounts/pos/login/`, info, {
     headers: { 'Content-Type': 'application/json' },
   });
 }
