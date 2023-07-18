@@ -8,6 +8,7 @@
       type="text"
       v-model="item.value"
       :placeholder="placeholder"
+      :inputmode="item.key === searchKey.user ? 'none' : 'text'"
       @focus="fnSetCurrent(searchItem)"
     />
     <slot name="operate"></slot>
@@ -16,9 +17,8 @@
   <div
     v-if="searchItem.isShowResult"
     class="absolute w-full top-[46px] left-0 bg-sky-50 h-80 overflow-y-auto"
-    @click.stop
   >
-    <Component :is="component" v-bind="$attrs" v-on="componentEvents" />
+    <Component :is="component" v-bind="$attrs" />
   </div>
 </template>
 
@@ -54,11 +54,6 @@ class Item {
     this.isShowLoading = isShowLoading;
   }
 }
-// eslint-disable-next-line no-shadow
-enum searchKey {
-  product = 'product',
-  user = 'User',
-}
 export default defineComponent({
   components: { SearchList, SearchUser },
   props: {
@@ -83,7 +78,12 @@ export default defineComponent({
       default: null,
     },
   },
-  setup(props, { emit }) {
+  setup(props) {
+    // eslint-disable-next-line no-shadow
+    enum searchKey {
+      product = 'product',
+      user = 'User',
+    }
     const item = reactive(props.searchItem);
     watchEffect(async () => {
       if (!item.value) {
@@ -97,25 +97,10 @@ export default defineComponent({
       await props.fnSearch(item);
     });
     const component = computed(() => (props.searchItem.key === 'product' ? 'SearchList' : 'SearchUser'));
-    const componentEvents = computed(() => (
-      props.searchItem.key === 'product'
-        ? {
-          addToCart: (target) => {
-            console.log(target);
-            emit('addToCart', target);
-          },
-        }
-        : {
-          setOrderMember: (target) => {
-            console.log(target);
-            emit('setOrderMember', target);
-          },
-        }
-    ));
     return {
       item,
       component,
-      componentEvents,
+      searchKey,
     };
   },
 });

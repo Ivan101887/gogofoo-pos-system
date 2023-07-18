@@ -88,6 +88,11 @@ function getHistoryOrders(params: {
     headers,
   });
 }
+function getAuthorization(authorizationObj) {
+  return axios.post(`${domain}/api/v1/auths/event/`, authorizationObj, {
+    headers,
+  });
+}
 export {
   loginPos,
   logout,
@@ -96,4 +101,5 @@ export {
   getSpecWithSerialNumber,
   updateRequestHeader,
   getMember,
+  getAuthorization,
 };

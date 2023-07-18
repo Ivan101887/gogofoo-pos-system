@@ -13,9 +13,10 @@
           :result="productList"
           :fn-set-current="setCurrentSearch"
           :fn-search="apiHandler"
+          :can-modify="canModify"
           @add-to-cart="addToCart"
         >
-          <template v-slot:operate>
+          <template #operate>
             <button class="bg-blue-800 px-1 text-white" @click="checkAuthorization">
               修改單價
             </button>
@@ -50,16 +51,25 @@
         <OrderCustomer :customer="memberInfo" />
       </section>
       <section class="container__foot h-3/5">
-        <Calculator :now-value="currentSearch?.value || ''" :update-value="inputFromPanel" />
+        <Calculator :now-value="nowValueForPanel" :update-value="inputFromPanel" />
       </section>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from 'vue';
-import { getSpecWithSerialNumber, getSpecListWithName, getMember } from '@/userRequest';
-import { IProductSpec, IShoppingItem, Customer } from '../../entities';
+import {
+  defineComponent, ref, reactive, computed, onMounted, PropType,
+} from 'vue';
+import {
+  getSpecWithSerialNumber,
+  getSpecListWithName,
+  getMember,
+  getAuthorization,
+} from '@/userRequest';
+import {
+  IProductSpec, IShoppingItem, Customer, permission,
+} from '../../entities';
 
 class SearchItem {
   key: string;
@@ -95,6 +105,12 @@ const noticeText = '輸入完整手機以查詢';
 const phoneRegex = /^09\d{8}$/;
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
+  props: {
+    permissionList: {
+      type: Array as PropType<string[]>,
+      default: () => [],
+    },
+  },
   setup() {
     /** 會員搜尋 */
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
@@ -113,22 +129,19 @@ export default defineComponent({
       currentChange.value = new IShoppingItem();
       currentKey.value = '';
     };
+    const nowValueForPanel = computed(
+      () => currentSearch.value.value || currentChange.value[currentKey.value] || '',
+    );
     const handleClick = (event) => {
-      // if (event.target.tagName.toLowerCase() === 'input') return;
-      // if (ele.value) {
-      //   ele.value.value = '';
-      //   nowValue.value = '';
-      // }
-      // ele.value = null;
-      // Object.keys(searchController).forEach((item) => {
-      //   searchController[item].isShowResult = false;
-      //   searchController[item].isShowLoading = false;
-      //   searchController[item].isShowError = false;
-      // });
+      if (event.target.tagName.toLowerCase() === 'input') return;
+      recoverCurrentSearch();
+      recoverCurrentChange();
     };
-    // onMounted(() => {
-    //   window.addEventListener('click', handleClick, false);
-    // });
+    /** 是否有權限修改價格 */
+    const canModify = ref(false);
+    onMounted(() => {
+      window.addEventListener('click', handleClick, false);
+    });
     /** 訂單的會員資訊 */
     const memberInfo = ref<Customer>(new Customer());
     // ^元素操作
@@ -152,7 +165,6 @@ export default defineComponent({
       currentSearch.value = item as SearchItem;
     };
     const setCurrentChange = (item, key = ''): void => {
-      console.log('set current change');
       currentChange.value = item as IShoppingItem;
       currentKey.value = key as string;
     };
@@ -259,11 +271,7 @@ export default defineComponent({
     const shoppingList = reactive<IShoppingItem[]>([]);
     const inputFromPanel = (value: string) => {
       if (currentKey.value) {
-        console.log(1111);
-        const idx = shoppingList.findIndex(
-          (item) => item.id === currentChange.value.id,
-        );
-        console.log(idx);
+        const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
         if (idx !== -1) {
           shoppingList[idx][currentKey.value] = value;
         }
@@ -281,7 +289,6 @@ export default defineComponent({
      * @return {void}
      */
     const addToCart = (product: IProductSpec) => {
-      console.log(product);
       const shoppingItem: IShoppingItem = {
         id: product.id,
         product_name: product.product_name + product.spec_name,
@@ -291,7 +298,6 @@ export default defineComponent({
         percentage_discount: 100,
         amount_discount: 0,
       };
-      console.log(shoppingItem);
       const index = shoppingList.findIndex(
         (item) => item.serial_number === shoppingItem.serial_number,
       );
@@ -309,14 +315,21 @@ export default defineComponent({
       }
     };
     const setOrderMember = (member: Customer) => {
-      console.log(member);
       memberInfo.value = member;
       recoverCurrentSearch();
       searchUserErrorMessage.value = noticeText;
       searchMember.value = new Customer();
     };
     const checkAuthorization = () => {
-      console.log('這邊需要做權限驗證');
+      const code = prompt('輸入驗證碼以授權');
+      console.log(code);
+      getAuthorization({ code })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
     return {
       // data
@@ -331,6 +344,7 @@ export default defineComponent({
       currentSearch,
       currentChange,
       currentKey,
+      canModify,
       // methods
       apiHandler,
       addToCart,
@@ -340,6 +354,7 @@ export default defineComponent({
       removeFromCart,
       setCurrentSearch,
       setCurrentChange,
+      nowValueForPanel,
     };
   },
 });

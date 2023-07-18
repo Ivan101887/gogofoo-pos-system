@@ -2,12 +2,12 @@
   <div v-if="isShowLoading" class="load">
     <Loading />
   </div>
-  <div v-else-if="result" class="result__list" @click="emit('setOrderMember', result)">
+  <div v-else-if="isSearchError" class="notify">
+    {{ errorMessage }}
+  </div>
+  <div v-else class="result__list" @click="emit('setOrderMember', result)">
     <p class="result__item">會員姓名: {{ result.name }}</p>
     <p class="result__item">電話號碼: {{ result.mobile }}</p>
-  </div>
-  <div v-else class="notify">
-    {{ errorMessage }}
   </div>
 </template>
 

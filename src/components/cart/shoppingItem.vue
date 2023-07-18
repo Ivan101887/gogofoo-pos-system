@@ -80,19 +80,20 @@ export default defineComponent({
   <tr>
     <td align="center" width="25%">{{ order['product_name'] }}</td>
     <td align="center" width="15%">
-      <div v-if="canModify">
-        {{ order[editField.price] }}
-      </div>
-      <label v-else :for="editField.price">
+      <label v-if="canModify" :for="editField.price">
         <input
           type="number"
           :name="editField.price"
           v-model="order[editField.price]"
           min="0"
           :max="maxPrice"
+          inputmode="none"
           @focus="focusOnEl(order, editField.price)"
         />
       </label>
+      <div v-else>
+        {{ order[editField.price] }}
+      </div>
     </td>
     <td align="center" width="13%">
       <label :for="editField.count">
@@ -100,6 +101,7 @@ export default defineComponent({
           type="number"
           :name="editField.count"
           v-model="order[editField.count]"
+          inputmode="none"
           @focus="focusOnEl(order, editField.count)"
         />
       </label>
@@ -113,6 +115,7 @@ export default defineComponent({
           max="100"
           min="0"
           step="5"
+          inputmode="none"
           @focus="focusOnEl(order, editField.discount)"
         />
       </label>
@@ -125,6 +128,7 @@ export default defineComponent({
           v-model="order[editField.coupon]"
           min="0"
           step="10"
+          inputmode="none"
           @focus="focusOnEl(order, editField.coupon)"
         />
       </label>

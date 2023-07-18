@@ -88,7 +88,7 @@ export default defineComponent({
 </script>
 <template>
   <Header :title="companyName" @logout="fnLogout" />
-  <router-view />
+  <router-view :permission-list="userInfo.permissions"/>
   <Login v-if="!isLogin" :is-error="isError" :notice="message" @login="fnLogin" />
 </template>
 

@@ -87,7 +87,12 @@ export class Customer {
     this.emoney_denominator = emoney_denominator;
   }
 }
-
+// eslint-disable-next-line no-shadow
+export enum permission {
+  authorize = 'authorisations.grant_auth_event',
+  operatePos = 'orders.add_order_from_pos_machine',
+  changePrice = 'discounts.add_sellingpricechange',
+}
 export class User {
   name: string;
 
