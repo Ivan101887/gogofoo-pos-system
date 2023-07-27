@@ -24,12 +24,38 @@
         </SearchInput>
       </div>
       <!-- 當筆訂單的所購商品 -->
-      <div class="cashier__body">
+      <div class="cashier__body h-4/5">
         <ShoppingList
           :shopping-list="shoppingList"
           :focus-on-el="setCurrentChange"
           @removeItem="removeFromCart"
         />
+      </div>
+      <div class="cashier__foot">
+        <label for="totalPercentage">
+          打折
+          <input
+            type="number"
+            value="0"
+            max="100"
+            min="0"
+            step="10"
+            name="totalPercentage"
+            inputmode="none"
+          />
+        </label>
+        <label for="totalPercentage">
+          折價
+          <input
+            type="number"
+            value="0"
+            max="100"
+            min="0"
+            step="10"
+            name="totalPercentage"
+            inputmode="none"
+          />
+        </label>
       </div>
     </section>
     <!-- 主畫面右半邊 -->
@@ -106,12 +132,13 @@ const phoneRegex = /^09\d{8}$/;
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 export default defineComponent({
   props: {
+    /** @params {Array} permissionList - 權限包 */
     permissionList: {
       type: Array as PropType<string[]>,
       default: () => [],
     },
   },
-  setup() {
+  setup(props, { emit }) {
     /** 會員搜尋 */
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
     const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
@@ -140,6 +167,7 @@ export default defineComponent({
     /** 是否有權限修改價格 */
     const canModify = ref(false);
     onMounted(() => {
+      console.log('hello');
       window.addEventListener('click', handleClick, false);
     });
     /** 訂單的會員資訊 */
@@ -320,15 +348,23 @@ export default defineComponent({
       searchUserErrorMessage.value = noticeText;
       searchMember.value = new Customer();
     };
+    const orderAuthorizedId = ref();
     const checkAuthorization = () => {
+      if (props.permissionList.includes(permission.changePrice)) {
+        canModify.value = true;
+        return;
+      }
       const code = prompt('輸入驗證碼以授權');
-      console.log(code);
+      console.log(typeof code);
+      if (code === null) return;
       getAuthorization({ code })
         .then((res) => {
-          console.log(res);
+          canModify.value = true;
+          emit('updatePermissionList', permission.changePrice);
         })
         .catch((err) => {
           console.log(err);
+          alert('取得權限失敗，請重新確認');
         });
     };
     return {

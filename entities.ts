@@ -128,6 +128,13 @@ export interface IProductSpec {
   vendor: string;
   weight: number;
 }
+
+export type discount = {
+  discount_type: string;
+  get_discount_type_display: string;
+  discount_value: 0;
+  discount_established_by: string;
+};
 interface IOrderItem {
   purchase_count: number;
   price_per_unit: number;
@@ -135,6 +142,7 @@ interface IOrderItem {
   amount_discount: number;
   product_name: string;
 }
+
 export class IShoppingItem implements IOrderItem {
   id: number;
 
@@ -197,17 +205,21 @@ export enum Operation {
   Reset = '清除',
 }
 export interface IOrderDetailed {
-  id: number;
-  order_from_platform: string;
-  order_forged_by_account: number;
-  customer: number;
-  name: string;
-  mobile: string;
-  payment_method: string;
-  payment_status: string;
-  customer_note: string;
-  date: string;
+  order_source_platform: string;
   order_number: string;
-  auth_event: number;
-  items: IOrderItem[];
+  date: string;
+  time: string;
+  customer: string;
+  customer_mobile: string;
+  payment_method: string;
+  used_e_money: number;
+  used_bonus: number;
+  final_price: number;
+  tax_number: string;
+  order_created_by: string;
+  auth_event: {
+    id: number;
+    requested_by_name: string;
+    authorised_by_name: string;
+  };
 }
