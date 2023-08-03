@@ -204,6 +204,9 @@ export enum Operation {
   Modify = '更正',
   Reset = '清除',
 }
+// export interface IDiscount {
+//   discount_type: string,
+// }
 export interface IOrderDetailed {
   order_source_platform: string;
   order_number: string;
@@ -222,4 +225,7 @@ export interface IOrderDetailed {
     requested_by_name: string;
     authorised_by_name: string;
   };
+  percentage_discount: number;
+  amount_discount: number;
+  items: IShoppingItem[];
 }

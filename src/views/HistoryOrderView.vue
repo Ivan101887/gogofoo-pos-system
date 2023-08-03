@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, reactive, ref, computed, watch,
+  defineComponent, reactive, ref, computed, watch, onMounted,
 } from 'vue';
 import OrderList from '@/components/order/OrderList.vue';
 import { getHistoryOrders } from '@/userRequest';
@@ -81,30 +81,30 @@ export default defineComponent({
     const paginationLength = computed(
       () => (totalOrders.value > limit ? totalOrders.value : limit) / limit,
     );
-    const options = reactive({
+    const options = computed(() => ({
       start: start.value,
       end: end.value,
       source_platform: 'pos_machine',
       limit,
       offset: limit * (nowPage.value - 1),
-    });
+    }));
     const pageNum = computed(() => Array.from(Array(paginationLength.value), (v, k) => k + 1));
-    const getOrderList = () => {
+    const getOrderList = async () => {
       if (start.value > end.value) {
         alert('你輸入的時間有誤');
         return;
       }
-      getHistoryOrders(options)
-        .then((res) => {
-          orders.push(...res.data.items);
-          totalOrders.value = res.data.count;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      console.log(start.value, end.value);
+      const res:{items: IOrderDetailed[], count:number} = await getHistoryOrders(options.value);
+      console.log(res);
+      orders.push(...res.items);
+      totalOrders.value = res.count;
     };
-    watch(nowPage, () => {
-      getOrderList();
+    watch(nowPage, async () => {
+      await getOrderList();
+    });
+    onMounted(async () => {
+      await getOrderList();
     });
     return {
       orders,

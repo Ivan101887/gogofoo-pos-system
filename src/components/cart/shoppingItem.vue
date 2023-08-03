@@ -102,6 +102,7 @@ export default defineComponent({
           :name="editField.count"
           v-model="order[editField.count]"
           inputmode="none"
+          min="1"
           @focus="focusOnEl(order, editField.count)"
         />
       </label>

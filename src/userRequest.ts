@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { IUser, loginInfo } from '../entities';
+import { IOrderDetailed, IUser, loginInfo } from '../entities';
 
 /** api的根路徑 */
 // const domain = {
@@ -82,11 +82,41 @@ function getHistoryOrders(params: {
   end: string | null;
   limit: number;
   offset: number;
-}): Promise<AxiosResponse> {
+}): Promise<
+  {items: IOrderDetailed[], count:number}
+> {
   return axios.get(`${domain}/api/v1/orders/list`, {
     params,
     headers,
-  });
+  })
+    .then((res) => ({
+      items: res.data.items.map((item) => ({
+        order_source_platform: item.order_source_platform,
+        order_number: item.order_number,
+        date: item.date,
+        time: item.time,
+        customer: item.customer,
+        customer_mobile: item.customer_mobile,
+        payment_method: item.payment_method,
+        used_e_money: item.used_e_money,
+        used_bonus: item.used_bonus,
+        final_price: item.final_price,
+        tax_number: item.tax_number,
+        order_created_by: item.order_created_by,
+        auth_event: item.auth_event,
+        percentage_discount: item.applied_discounts.find((discount) => discount.discountType === 'percentage_discount_type')?.discount_value,
+        amount_discount: item.applied_discounts.find((discount) => discount.discountType === 'amount_discount_type')?.discount_value,
+        items: item.items,
+      })),
+      count: res.data.count,
+    }))
+    .catch((err) => {
+      console.log(err);
+      return {
+        items: [],
+        count: 0,
+      };
+    });
 }
 function getAuthorization(authorizationObj) {
   return axios.post(`${domain}/api/v1/auths/event/`, authorizationObj, {
