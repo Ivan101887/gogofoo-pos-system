@@ -24,38 +24,97 @@
         </SearchInput>
       </div>
       <!-- 當筆訂單的所購商品 -->
-      <div class="cashier__body h-4/5">
+      <div class="cashier__body h-1/2 border-b border-slate-300 border-solid overflow-y-auto">
         <ShoppingList
           :shopping-list="shoppingList"
           :focus-on-el="setCurrentChange"
+          :canModify="canModify"
           @removeItem="removeFromCart"
         />
       </div>
-      <div class="cashier__foot">
-        <label for="totalPercentage">
-          打折
+      <div :class="[
+          'cashier__foot grow flex flex-col gap-2 px-5 py-3',
+          {'cashier__foot--modal': !shoppingList.length}
+        ]
+      ">
+        <div for="totalPercentage" class="flex gap-5 items-center">
+          <p class="text-xl w-[150px]">
+            折扣前訂單總額:
+          </p>
+          <p class="block grow text-xl p-2 pr-5 text-right"
+          >
+            {{ totalBeforeDiscount }}
+          </p>
+        </div>
+        <label for="totalPercentage" class="flex gap-5 items-center">
+          <p class="text-xl w-[150px]">
+            折扣:
+          </p>
           <input
             type="number"
-            value="0"
+            v-model="percentageDiscount"
             max="100"
             min="0"
             step="10"
+            class="block grow text-xl outline outline-1 p-2 rounded text-right"
             name="totalPercentage"
             inputmode="none"
           />
         </label>
-        <label for="totalPercentage">
-          折價
+        <label for="totalPercentage" class="flex gap-5 items-center">
+          <p class="text-xl w-[150px]">
+            折價:
+          </p>
           <input
             type="number"
-            value="0"
+            v-model="amountDiscount"
             max="100"
             min="0"
             step="10"
+            class="block grow text-xl outline outline-1 p-2 rounded text-right"
             name="totalPercentage"
             inputmode="none"
           />
         </label>
+        <label for="totalPercentage" class="flex gap-5 items-center">
+          <p class="text-xl w-[150px]">
+            業務獎金:
+          </p>
+          <input
+            type="number"
+            v-model="usedEMoney"
+            max="100"
+            min="0"
+            step="10"
+            class="block grow text-xl outline outline-1 p-2 rounded text-right"
+            name="totalPercentage"
+            inputmode="none"
+          />
+        </label>
+        <label for="totalPercentage" class="flex gap-5 items-center">
+          <p class="text-xl w-[150px]">
+            購物金:
+          </p>
+          <input
+            type="number"
+            v-model="usedBonus"
+            max="100"
+            min="0"
+            step="10"
+            class="block grow text-xl outline outline-1 p-2 rounded text-right"
+            name="totalPercentage"
+            inputmode="none"
+          />
+        </label>
+        <div for="totalPercentage" class="flex gap-5 items-center">
+          <p class="text-xl w-[150px]">
+            折扣後總金額:
+          </p>
+          <p class="block grow text-xl p-2 pr-5 text-right"
+          >
+            {{ orderTotal }}
+          </p>
+        </div>
       </div>
     </section>
     <!-- 主畫面右半邊 -->
@@ -146,7 +205,6 @@ export default defineComponent({
     const currentSearch = ref<SearchItem>(new SearchItem());
     const currentKey = ref<string>('');
     const recoverCurrentSearch = (): void => {
-      currentSearch.value.key = '';
       currentSearch.value.value = '';
       currentSearch.value.isShowResult = false;
       currentSearch.value.isShowLoading = false;
@@ -167,7 +225,6 @@ export default defineComponent({
     /** 是否有權限修改價格 */
     const canModify = ref(false);
     onMounted(() => {
-      console.log('hello');
       window.addEventListener('click', handleClick, false);
     });
     /** 訂單的會員資訊 */
@@ -348,14 +405,29 @@ export default defineComponent({
       searchUserErrorMessage.value = noticeText;
       searchMember.value = new Customer();
     };
-    const orderAuthorizedId = ref();
+    const usedEMoney = ref(0);
+    const amountDiscount = ref(0);
+    const percentageDiscount = ref(100);
+    const usedBonus = ref(0);
+    const shoppingItemTotal = computed(() => shoppingList.map((order) => Math.round(
+      order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
+    )
+        - order.amount_discount));
+    const totalBeforeDiscount = computed(
+      () => shoppingItemTotal.value.reduce((acc, item) => acc + item, 0),
+    );
+    const orderTotal = computed(
+      () => Math.round(
+        totalBeforeDiscount.value * (percentageDiscount.value / 100),
+      ) - amountDiscount.value - usedEMoney.value - usedBonus.value,
+    );
+    const orderAuthorizedId = ref(0);
     const checkAuthorization = () => {
       if (props.permissionList.includes(permission.changePrice)) {
         canModify.value = true;
         return;
       }
       const code = prompt('輸入驗證碼以授權');
-      console.log(typeof code);
       if (code === null) return;
       getAuthorization({ code })
         .then((res) => {
@@ -381,6 +453,12 @@ export default defineComponent({
       currentChange,
       currentKey,
       canModify,
+      totalBeforeDiscount,
+      usedEMoney,
+      amountDiscount,
+      percentageDiscount,
+      usedBonus,
+      orderTotal,
       // methods
       apiHandler,
       addToCart,
@@ -395,3 +473,25 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss" scoped>
+  .cashier {
+    &__foot--modal {
+      position: relative;
+      &::after {
+        content: '加入訂單後操作...';
+        display: block;
+        color: #fff;
+        font-size: 30px;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        top: 0;
+        left: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: #0008;
+      }
+    }
+  }
+</style>

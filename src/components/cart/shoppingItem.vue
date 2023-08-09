@@ -32,9 +32,8 @@ export default defineComponent({
     const order = reactive(props.item);
     const maxPrice = { ...order }.price_per_unit;
     const total = computed(() => Math.round(
-      order.price_per_unit * order.purchase_count * (order.percentage_discount / 100)
-          - order.amount_discount,
-    ));
+      order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
+    ) - order.amount_discount);
     const changeValue = (e, key) => {
       const discountBase = 100;
       const value = parseInt(e.target.innerHTML, 10);
