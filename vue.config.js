@@ -6,7 +6,7 @@ const Components = require('unplugin-vue-components/webpack');
 const { ElementPlusResolver } = require('unplugin-vue-components/resolvers');
 
 module.exports = defineConfig({
-  outputDir: '/dist',
+  outputDir: 'dist',
   publicPath: '/',
   devServer: {
     port: 8080,
