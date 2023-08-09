@@ -1,9 +1,15 @@
 .btn {
-  @apply px-4 py-3 rounded;
+  @apply rounded cursor-pointer;
+  &-md {
+    @apply px-3;
+  }
   &-cancel {
     @apply bg-slate-200;
   }
   &-success {
     @apply bg-green-500;
+  }
+  &-white {
+    @apply bg-white;
   }
 }

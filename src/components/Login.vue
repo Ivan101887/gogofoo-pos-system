@@ -1,7 +1,7 @@
 <!-- eslint-disable vuejs-accessibility/label-has-for -->
 <template>
   <div class="modal">
-    <section class="login">
+    <form class="login" :class="{ 'error': isError}" @submit.prevent autocomplete="on">
       <div class="login__head">
         <div class="login__iconWrapper">
           <font-awesome-icon
@@ -11,67 +11,81 @@
             style="color: #4778cd;"
           />
         </div>
+        <div class="login__notice">{{ notice }}</div>
       </div>
       <div class="login__body">
         <div class="login__box">
           <label for="UserName" class="block login__label">帳號:</label>
           <input
+            ref="acc"
             type="text"
             id="UserName"
             class="block login__input"
             placeholder="請輸入帳號以登入"
             v-model="loginInfo.username"
+            @keyup.enter.self="fnFocusNext"
           />
         </div>
-        <form class="login__box">
+        <div class="login__box">
           <label for="Password" class="block login__label">密碼:</label>
           <input
+            ref="pwd"
             type="password"
             id="Password"
             class="block login__input"
             placeholder="請輸入密碼以登入"
             v-model="loginInfo.password"
+            @keyup.enter="fnLogin"
           />
-        </form>
+        </div>
       </div>
       <div class="login__foot">
-        <button type="reset" class="login__btn btn btn-cancel">清除</button>
-        <button type="button" class="login__btn btn btn-success" @click="fnLogin">登入</button>
+        <button type="reset" class="login__btn btn btn-md btn-cancel">清除</button>
+        <button
+          type="button"
+          class="login__btn btn btn-md btn-success"
+          @click.self.prevent="fnLogin"
+        >
+          登入
+        </button>
       </div>
-    </section>
+    </form>
   </div>
 </template>
 
 <script lang="ts">
-import axios from 'axios';
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref } from 'vue';
+import { loginInfo as typeLoginInfo } from '../../entities';
 
 export default {
-  setup() {
-    const loginInfo = reactive({ username: '', password: '' });
+  props: {
+    isError: {
+      type: Boolean,
+      default: false,
+    },
+    notice: {
+      type: String,
+      default: '',
+    },
+  },
+  emit: ['login'],
+  setup(props, { emit }) {
+    const pwd = ref();
+    const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
     const fnLogin = ():void => {
-      console.log('這邊要登入');
-      axios.post(
-        'https://admin.gogofoo.com/accounts/login/',
-        { ...loginInfo },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
+      emit('login', loginInfo);
     };
+    function fnFocusNext() {
+      pwd.value.focus();
+    }
     return {
-      loginInfo,
       fnLogin,
+      loginInfo,
+      fnFocusNext,
+      emit,
+      pwd,
     };
   },
-  // computed: {
-  //   loginInfo(): {acc: string, pwd: string} {
-  //     return {
-  //       acc: '',
-  //       pwd: '',
-  //     };
-  //   },
-  // },
 };
 </script>
 
@@ -97,6 +111,9 @@ export default {
     vertical-align: middle;
     transform: translate(-50%, -50%);
   }
+  &__head {
+    @apply flex flex-col items-center gap-y-3;
+  }
   &__body {
     @apply flex flex-col;
     @apply w-[100%] gap-[16px];
@@ -114,6 +131,16 @@ export default {
   &__btn {
     & + & {
       @apply ml-3;
+    }
+  }
+}
+.error {
+  .login {
+    &__notice {
+      @apply text-red-500;
+    }
+    &__input {
+      @apply bg-red-100 border-rose-600;
     }
   }
 }
