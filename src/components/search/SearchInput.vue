@@ -26,7 +26,7 @@
 import {
   defineComponent, PropType, reactive, computed, watchEffect,
 } from 'vue';
-import SearchList from './SearchList.vue';
+import SearchList from './searchList.vue';
 import SearchUser from './SearchUser.vue';
 
 class Item {
