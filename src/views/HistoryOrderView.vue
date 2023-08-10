@@ -2,11 +2,6 @@
   <div class="head">
     <h1 class="text-center text-4xl py-4 bg-sky-50 caret-transparent">歷史訂單</h1>
     <div class="operate">
-        <!-- :labels="{
-          name: 'name',
-          salary: 'salary',
-          hours: 'Hours/week',
-        }" -->
         <downloadCsv
           :data="orders"
           :separator-excel="true"
@@ -16,16 +11,6 @@
             <b>下載訂單明細</b>
           </button>
         </downloadCsv>
-
-      <!-- <downloadCsv
-        :data="orders"
-        :separator-excel="true"
-        :name="`${start} - ${end}訂單明細`"
-      >
-        <button class="teal button__custom">
-          <b>下載訂單明細</b>
-        </button>
-      </downloadCsv> -->
       <div class="operate__timeSelector">
         <label for="start">
           <input type="date" v-model="start" name="start" />
@@ -67,12 +52,13 @@ import {
 } from 'vue';
 import OrderList from '@/components/order/OrderList.vue';
 import { getHistoryOrders } from '@/userRequest';
+import dayjs from 'dayjs';
 import { IOrderDetailed } from '../../entities';
 
 export default defineComponent({
   setup() {
-    const start = ref(new Date().toISOString().slice(0, 10));
-    const end = ref(new Date().toISOString().slice(0, 10));
+    const start = ref(dayjs().format('YYYY-MM-DD'));
+    const end = ref(dayjs().add(1, 'day').format('YYYY-MM-DD'));
     const orders = reactive<IOrderDetailed[]>([]);
     // ^pagination related
     const nowPage = ref(1);
@@ -94,10 +80,9 @@ export default defineComponent({
         alert('你輸入的時間有誤');
         return;
       }
-      console.log(start.value, end.value);
       const res:{items: IOrderDetailed[], count:number} = await getHistoryOrders(options.value);
-      console.log(res);
       orders.push(...res.items);
+      console.log(res);
       totalOrders.value = res.count;
     };
     watch(nowPage, async () => {

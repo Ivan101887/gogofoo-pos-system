@@ -191,11 +191,8 @@ export interface IOrderInfo {
 }
 // eslint-disable-next-line no-shadow
 export enum PaymentMethod {
-  CreditCard = '刷卡',
-  Cash = '現金',
-  Coupon = '購物金',
-  Credit = '抵用金',
-  Discount = '折扣',
+  CreditCard,
+  Cash,
 }
 // eslint-disable-next-line no-shadow
 export enum Operation {
@@ -220,6 +217,7 @@ export interface IOrderDetailed {
   final_price: number;
   tax_number: string;
   order_created_by: string;
+  product_name: string;
   auth_event: {
     id: number;
     requested_by_name: string;
