@@ -37,7 +37,7 @@
           {'cashier__foot--modal': !shoppingList.length}
         ]
       ">
-        <div for="totalPercentage" class="flex gap-5 items-center">
+        <div class="flex gap-5 items-center">
           <p class="text-xl w-[150px]">
             折扣前訂單總額:
           </p>
@@ -61,7 +61,7 @@
             inputmode="none"
           />
         </label>
-        <label for="totalPercentage" class="flex gap-5 items-center">
+        <label for="totalDiscount" class="flex gap-5 items-center">
           <p class="text-xl w-[150px]">
             折價:
           </p>
@@ -72,11 +72,11 @@
             min="0"
             step="10"
             class="block grow text-xl outline outline-1 p-2 rounded text-right"
-            name="totalPercentage"
+            name="totalDiscount"
             inputmode="none"
           />
         </label>
-        <label for="totalPercentage" class="flex gap-5 items-center">
+        <label for="totalEMoney" class="flex gap-5 items-center">
           <p class="text-xl w-[150px]">
             業務獎金:
           </p>
@@ -87,32 +87,56 @@
             min="0"
             step="10"
             class="block grow text-xl outline outline-1 p-2 rounded text-right"
-            name="totalPercentage"
+            name="totalEMoney"
             inputmode="none"
           />
         </label>
-        <label for="totalPercentage" class="flex gap-5 items-center">
+        <label for="totalBonus" class="flex gap-5 items-center">
           <p class="text-xl w-[150px]">
             購物金:
           </p>
           <input
             type="number"
+            :disabled="!canUseBonus"
             v-model="usedBonus"
             max="100"
             min="0"
             step="10"
             class="block grow text-xl outline outline-1 p-2 rounded text-right"
-            name="totalPercentage"
+            name="totalBonus"
             inputmode="none"
           />
         </label>
-        <div for="totalPercentage" class="flex gap-5 items-center">
+        <div class="flex gap-5 items-center">
           <p class="text-xl w-[150px]">
             折扣後總金額:
           </p>
-          <p class="block grow text-xl p-2 pr-5 text-right"
+          <p class="grow text-xl p-2 pr-5 text-right"
           >
             {{ orderTotal }}
+          </p>
+        </div>
+        <div class="mt-12 flex items-end justify-end w-full gap-2">
+          <p class="text-xl">
+            <button type="button"
+              class="
+              bg-gray-300 hover:bg-gray-400 text-gray-800
+                font-bold py-4 px-6 border border-gray-300 rounded"
+                @click="confirmCancelOrder"
+              >
+              取消
+            </button>
+          </p>
+          <p class="text-xl">
+            <button type="button"
+              class="
+                bg-blue-500
+                hover:bg-blue-700
+                text-white font-bold py-4 px-6 border border-blue-700 rounded"
+                @click="isShowModal = true"
+              >
+              確認
+            </button>
           </p>
         </div>
       </div>
@@ -140,6 +164,80 @@
       </section>
     </div>
   </div>
+  <div :class="
+      ['modal fixed bottom-0 left-[-100%] h-1/2 w-[60%]',
+        'bg-[#0002] transition-all duration-1000 ease-in-out translate-x-{-100%}',
+      {'left-[0px]': isShowModal}]
+    ">
+    <div class="fixed bottom-0 h-1/2 w-[47%] bg-white shadow-lg shadow-cyan-500/50 opacity-100 p-3">
+      <div class="">
+        <p class="text-5xl flex">
+          總金額:
+          <span class="grow text-end">
+            {{ orderTotal }}
+          </span>
+        </p>
+      </div>
+      <div class="mt-3">
+        <label for="paidCash" class="text-4xl flex gap-2 items-center">
+          <span class="grow">
+            實際支付金額:
+          </span>
+          <input
+            v-model="payCash"
+            name="payCash"
+            placeholder="已付金額"
+            type="number"
+            class="p-3 w-[300px]"
+          />
+        </label>
+      </div>
+      <div class="">
+        <p class="text-5xl flex">
+          找零:
+          <span class="grow text-end">
+            {{ payCash > 0 ? orderTotal - payCash : 0 }}
+          </span>
+        </p>
+      </div>
+    </div>
+    <div class="fixed bottom-0 flex gap-2 w-[45%] my-3">
+      <p class="text-xl grow">
+        <button type="button"
+          class="
+            w-full
+          bg-orange-300 hover:bg-orange-400 text-gray-800
+            font-bold py-4 px-6 border border-gray-300 rounded
+          "
+          @click="assignPayment('card')"
+        >
+            刷卡結帳
+        </button>
+      </p>
+      <p class="text-xl grow">
+        <button type="button"
+          class="
+            bg-blue-500
+            hover:bg-blue-700
+            w-full
+            text-white font-bold py-4 px-6 border border-blue-700 rounded
+          "
+          @click="assignPayment('cash')"
+        >
+          現金結帳
+        </button>
+      </p>
+    </div>
+    <div
+      class="
+        bg-white rounded-[50%] absolute right-1 w-16 h-16 top-1
+        leading-[64px] text-center tex-[20px] cursor-pointer
+      "
+      @click="isShowModal = false"
+    >
+      X
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -151,6 +249,7 @@ import {
   getSpecListWithName,
   getMember,
   getAuthorization,
+  createNewOrder,
 } from '@/userRequest';
 import {
   IProductSpec, IShoppingItem, Customer, permission,
@@ -189,6 +288,7 @@ enum searchKey {
 const noticeText = '輸入完整手機以查詢';
 const phoneRegex = /^09\d{8}$/;
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
+
 export default defineComponent({
   props: {
     /** @params {Array} permissionList - 權限包 */
@@ -199,6 +299,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     /** 會員搜尋 */
+    const isShowModal = ref(false);
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
     const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
     const currentChange = ref<IShoppingItem>(new IShoppingItem());
@@ -409,6 +510,7 @@ export default defineComponent({
     const amountDiscount = ref(0);
     const percentageDiscount = ref(100);
     const usedBonus = ref(0);
+    const payCash = ref(0);
     const shoppingItemTotal = computed(() => shoppingList.map((order) => Math.round(
       order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
     )
@@ -421,6 +523,9 @@ export default defineComponent({
         totalBeforeDiscount.value * (percentageDiscount.value / 100),
       ) - amountDiscount.value - usedEMoney.value - usedBonus.value,
     );
+    const canUseBonus = computed(
+      () => totalBeforeDiscount.value > memberInfo.value.emoney_denominator,
+    );
     const orderAuthorizedId = ref(0);
     const checkAuthorization = () => {
       if (props.permissionList.includes(permission.changePrice)) {
@@ -432,6 +537,7 @@ export default defineComponent({
       getAuthorization({ code })
         .then((res) => {
           canModify.value = true;
+          orderAuthorizedId.value = res.data.id;
           emit('updatePermissionList', permission.changePrice);
         })
         .catch((err) => {
@@ -439,8 +545,56 @@ export default defineComponent({
           alert('取得權限失敗，請重新確認');
         });
     };
+    const taxNumber = ref('');
+    const payment = ref('');
+    const resetData = () => {
+      shoppingList.splice(0);
+      usedBonus.value = 0;
+      usedEMoney.value = 0;
+      percentageDiscount.value = 100;
+      amountDiscount.value = 0;
+      payment.value = '';
+      memberInfo.value = new Customer();
+      taxNumber.value = '';
+      payCash.value = 0;
+      payment.value = '';
+      isShowModal.value = false;
+    };
+    const createOrder = async () => {
+      const apiData = {
+        mobile: memberInfo.value.mobile,
+        used_e_money: usedEMoney.value,
+        used_bonus: usedBonus.value,
+        payment_method: payment.value,
+        tax_number: taxNumber.value,
+        percentage_discount: percentageDiscount.value,
+        amount_discount: amountDiscount.value,
+        auth_event_id: orderAuthorizedId.value,
+        items: [...shoppingList],
+      };
+      try {
+        const res = await createNewOrder(apiData);
+        window.alert(`成功建立訂單${res}`);
+        resetData();
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    const confirmCancelOrder = () => {
+      const confirm = window.confirm('message');
+      if (!confirm) return;
+      resetData();
+    };
+    const assignPayment = async (pay) => {
+      if (!payCash.value) {
+        payCash.value = orderTotal.value;
+      }
+      payment.value = pay;
+      await createOrder();
+    };
     return {
       // data
+      isShowModal,
       searchItemProduct,
       searchItemUser,
       productList,
@@ -459,6 +613,11 @@ export default defineComponent({
       percentageDiscount,
       usedBonus,
       orderTotal,
+      nowValueForPanel,
+      payment,
+      canUseBonus,
+      payCash,
+      createOrder,
       // methods
       apiHandler,
       addToCart,
@@ -468,7 +627,8 @@ export default defineComponent({
       removeFromCart,
       setCurrentSearch,
       setCurrentChange,
-      nowValueForPanel,
+      confirmCancelOrder,
+      assignPayment,
     };
   },
 });
