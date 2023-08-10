@@ -28,7 +28,8 @@ export default defineComponent({
         <th class="p-1" width="13%">數量</th>
         <th class="p-1" width="12%">打折</th>
         <th class="p-1" width="15%">折扣金額</th>
-        <th class="p-1" width="20%">小結</th>
+        <th class="p-1" width="15%">小結</th>
+        <th class="p-1" width="5%"></th>
       </tr>
     </thead>
     <tbody>

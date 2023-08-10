@@ -43,11 +43,6 @@ export default defineComponent({
             alert('價格設定有誤，請輸入正確的價格!!');
           }
           break;
-        case editField.count:
-          if (value <= 0) {
-            emit('removeItem', order.id);
-          }
-          break;
         case editField.discount:
           if (!(value <= discountBase && value > 0)) {
             alert('打折請輸入0-100之間');
@@ -71,6 +66,7 @@ export default defineComponent({
       changeValue,
       maxPrice,
       editField,
+      emit,
     };
   },
 });
@@ -133,7 +129,10 @@ export default defineComponent({
         />
       </label>
     </td>
-    <td align="center" width="20%">{{ total }}</td>
+    <td align="center" width="15%">{{ total }}</td>
+    <td align="center" width="5%">
+      <button class="btn" @click="emit('removeItem', order.id)">移除</button>
+    </td>
   </tr>
 </template>
 <style lang="scss" scoped>
