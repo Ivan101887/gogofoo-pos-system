@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
-import { IOrderDetailed, IUser, loginInfo } from '../entities';
+import {
+  IOrderDetailed, IUser, loginInfo, IShoppingItem,
+} from '../entities';
 
 /** api的根路徑 */
 // const domain = {
@@ -99,6 +101,7 @@ function getHistoryOrders(params: {
         customer_mobile: item.customer_mobile,
         payment_method: item.payment_method,
         used_e_money: item.used_e_money,
+        product_name: item.product_name,
         used_bonus: item.used_bonus,
         final_price: item.final_price,
         tax_number: item.tax_number,
@@ -123,6 +126,25 @@ function getAuthorization(authorizationObj) {
     headers,
   });
 }
+function createNewOrder(orderObj: {
+  'mobile': string,
+  'used_e_money': number,
+  'used_bonus': number,
+  'payment_method': string,
+  'tax_number': string,
+  'percentage_discount': number,
+  'amount_discount': number,
+  'auth_event_id': number,
+  'items': IShoppingItem[],
+  }) {
+  return axios.post(
+    `${domain}/api/v1/orders/create`,
+    orderObj,
+    { headers },
+  )
+    .then((res) => res.data)
+    .catch((err) => err);
+}
 export {
   loginPos,
   logout,
@@ -132,4 +154,5 @@ export {
   updateRequestHeader,
   getMember,
   getAuthorization,
+  createNewOrder,
 };
