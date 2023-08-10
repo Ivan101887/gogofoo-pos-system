@@ -101,7 +101,6 @@ function getHistoryOrders(params: {
         customer_mobile: item.customer_mobile,
         payment_method: item.payment_method,
         used_e_money: item.used_e_money,
-        product_name: item.product_name,
         used_bonus: item.used_bonus,
         final_price: item.final_price,
         tax_number: item.tax_number,

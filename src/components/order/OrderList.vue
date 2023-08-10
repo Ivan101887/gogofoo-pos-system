@@ -17,42 +17,50 @@
         class="hover:bg-cyan-50 even:bg-sky-50 odd:bg-white cursor-pointer"
       >
         <td
-          class="p-2 hover:bg-cyan-50"
+          class="p-2 align-middle"
           valign="middle"
           align="center"
-          :rowspan="order.items.length"
         >
           {{ order.order_number }}
         </td>
-        <template v-for="(item, index) in order.items" :key="index">
-          <td class="p-2 hover:bg-cyan-50" valign="middle" align="center">
-            {{ item.product_name }}
-          </td>
-          <td class="p-2" valign="middle" align="center">{{ item.purchase_count }}</td>
-        </template>
+        <td class="p-2 align-middle" valign="middle" align="center">
+          <template
+            v-for="item in order.items"
+            :key="item.serial_number"
+          >
+            <span class="block">
+              {{ item.product_name }}
+            </span>
+          </template>
+        </td>
+        <td class="p-2 align-middle" valign="middle" align="center">
+          <template
+            v-for="item in order.items"
+            :key="item.serial_number"
+          >
+            <span class="block">{{ item.purchase_count }}</span>
+          </template>
+        </td>
         <td
-          class="p-2 hover:bg-cyan-50"
+          class="p-2 align-middle"
           valign="middle"
           align="center"
-          :rowspan="order.items.length"
         >
           {{ order.date }}
         </td>
         <td
-          class="p-2 hover:bg-cyan-50"
+          class="p-2 align-middle"
           valign="middle"
           align="center"
-          :rowspan="order.items.length"
         >
           {{ order.payment_method }}
         </td>
         <td
-          class="p-2 hover:bg-cyan-50"
+          class="p-2 align-middle"
           valign="middle"
           align="center"
-          :rowspan="order.items.length"
         >
-          4000
+          {{ order.final_price}}
         </td>
       </tr>
     </tbody>
@@ -72,6 +80,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-</style>
