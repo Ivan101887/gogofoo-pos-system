@@ -5,11 +5,13 @@ const AutoImport = require('unplugin-auto-import/webpack');
 const Components = require('unplugin-vue-components/webpack');
 const { ElementPlusResolver } = require('unplugin-vue-components/resolvers');
 
+const { VantResolver } = require('@vant/auto-import-resolver');
+
 module.exports = defineConfig({
   outputDir: 'dist',
   publicPath: '/',
   devServer: {
-    port: 8080,
+    port: 8084,
   },
   css: {
     loaderOptions: {
@@ -33,7 +35,7 @@ module.exports = defineConfig({
         resolver: [ElementPlusResolver()],
       }),
       Components({
-        resolver: [ElementPlusResolver()],
+        resolver: [ElementPlusResolver(), VantResolver()],
       }),
     ],
   },
