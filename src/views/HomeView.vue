@@ -160,7 +160,8 @@
         <OrderCustomer :customer="memberInfo" />
       </section>
       <section class="container__foot h-3/5">
-        <Calculator :now-value="nowValueForPanel" :update-value="inputFromPanel" />
+        <!-- <Calculator :now-value="nowValueForPanel" :update-value="inputFromPanel" /> -->
+        <Keyboard :value="testVal" />
       </section>
     </div>
   </div>
@@ -298,6 +299,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const testVal = ref('');
     /** 會員搜尋 */
     const isShowModal = ref(false);
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
@@ -593,6 +595,7 @@ export default defineComponent({
       await createOrder();
     };
     return {
+      testVal,
       // data
       isShowModal,
       searchItemProduct,

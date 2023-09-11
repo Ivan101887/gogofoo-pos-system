@@ -35,7 +35,7 @@ module.exports = defineConfig({
         resolver: [ElementPlusResolver()],
       }),
       Components({
-        resolver: [ElementPlusResolver(), VantResolver()],
+        resolver: [VantResolver(), ElementPlusResolver()],
       }),
     ],
   },

@@ -86,7 +86,6 @@ export default defineComponent({
     }
     const item = reactive(props.searchItem);
     watchEffect(async () => {
-      console.log(item);
       if (!item.value) {
         item.isShowLoading = false;
         item.isShowResult = false;

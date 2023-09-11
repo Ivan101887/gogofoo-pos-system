@@ -12,6 +12,7 @@ declare module '@vue/runtime-core' {
     Calculator: typeof import('./src/components/calculator.vue')['default']
     CheckOperation: typeof import('./src/components/CheckOperation.vue')['default']
     Header: typeof import('./src/components/layout/header.vue')['default']
+    Keyboard: typeof import('./src/components/Keyboard.vue')['default']
     Loading: typeof import('./src/components/Loading.vue')['default']
     Login: typeof import('./src/components/Login.vue')['default']
     OrderCustomer: typeof import('./src/components/OrderCustomer.vue')['default']
