@@ -161,7 +161,7 @@
       </section>
       <section class="container__foot h-3/5">
         <!-- <Calculator :now-value="nowValueForPanel" :update-value="inputFromPanel" /> -->
-        <Keyboard :value="testVal" />
+        <Keyboard :update-value="inputFromPanel" />
       </section>
     </div>
   </div>
@@ -299,7 +299,6 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const testVal = ref('');
     /** 會員搜尋 */
     const isShowModal = ref(false);
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
@@ -321,7 +320,9 @@ export default defineComponent({
       () => currentSearch.value.value || currentChange.value[currentKey.value] || '',
     );
     const handleClick = (event) => {
-      if (event.target.tagName.toLowerCase() === 'input') return;
+      console.log(event.target);
+      if (event.target.classList.contains('van-key')) return;
+      console.log('tete');
       recoverCurrentSearch();
       recoverCurrentChange();
     };
@@ -458,6 +459,7 @@ export default defineComponent({
     /** 傳入計算機元件，透過面板更新輸入 */
     const shoppingList = reactive<IShoppingItem[]>([]);
     const inputFromPanel = (value: string) => {
+      console.log(currentKey.value, currentSearch.value);
       if (currentKey.value) {
         const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
         if (idx !== -1) {
@@ -467,6 +469,7 @@ export default defineComponent({
       }
       if (currentSearch.value) {
         currentSearch.value.value = value as string;
+        console.log(currentSearch.value.value);
       }
     };
 
@@ -595,7 +598,6 @@ export default defineComponent({
       await createOrder();
     };
     return {
-      testVal,
       // data
       isShowModal,
       searchItemProduct,

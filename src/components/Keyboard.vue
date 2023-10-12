@@ -13,23 +13,32 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
 
+const emit = defineEmits(['update-value']);
 const props = defineProps({
-  value: {
-    type: String,
-    default: '',
+  updateValue: {
+    type: Function,
+    default: null,
   },
 });
 const bindValue = ref(props.value);
-const onInput = (value) => {
-  if (bindValue.value) {
-    bindValue.value += value;
-  } else {
-    bindValue.value = value;
-  }
+const onInput = (value) : void => {
+  props.updateValue(value);
   console.log(value);
+  // if (bindValue.value) {
+  // } else {
+  //   bindValue.value = value;
+  // }
 };
+// const onInput = (value) : void => {
+//   if (bindValue.value) {
+//     bindValue.value += value;
+//     emit('update-value');
+//   } else {
+//     bindValue.value = value;
+//   }
+// };
 const onDelete = () => {
   console.log('delete number');
 };
