@@ -9,8 +9,9 @@
       v-model="item.value"
       :placeholder="placeholder"
       :inputmode="item.key === searchKey.user ? 'none' : 'text'"
-      @focus="fnSetCurrent(searchItem)"
+      @focus.stop="onFocus(searchItem)"
     />
+      <!-- @focus="fnSetCurrent(searchItem)" -->
     <slot name="operate"></slot>
   </label>
   <!-- 商品檢索結果 -->
@@ -97,10 +98,15 @@ export default defineComponent({
       await props.fnSearch(item);
     });
     const component = computed(() => (props.searchItem.key === 'product' ? 'SearchList' : 'SearchUser'));
+    const onFocus = (obj) : void => {
+      console.log('test');
+      props.fnSetCurrent(obj);
+    };
     return {
       item,
       component,
       searchKey,
+      onFocus,
     };
   },
 });

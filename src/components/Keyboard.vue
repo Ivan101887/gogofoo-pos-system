@@ -1,6 +1,6 @@
 <template>
   <div class="keyboard flex flex-col">
-    <van-field v-model="bindValue" label="金额" readonly />
+    <van-field label="金额" readonly />
     <van-number-keyboard
       theme="custom"
       :extra-key="['00', '.']"
@@ -13,7 +13,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import {
+  ref, defineProps, defineEmits, watch,
+} from 'vue';
 
 const emit = defineEmits(['update-value']);
 const props = defineProps({
@@ -22,26 +24,21 @@ const props = defineProps({
     default: null,
   },
 });
-const bindValue = ref(props.value);
-const onInput = (value) : void => {
+const value = ref('');
+const onInput = (v) : void => {
+  if (value.value) {
+    value.value += `${v}`;
+    return;
+  }
+  value.value = `${v}`;
+};
+const onDelete = () : void => {
+  value.value = value.value.slice(0, -1);
+};
+watch(value, () => {
   props.updateValue(value);
   console.log(value);
-  // if (bindValue.value) {
-  // } else {
-  //   bindValue.value = value;
-  // }
-};
-// const onInput = (value) : void => {
-//   if (bindValue.value) {
-//     bindValue.value += value;
-//     emit('update-value');
-//   } else {
-//     bindValue.value = value;
-//   }
-// };
-const onDelete = () => {
-  console.log('delete number');
-};
+});
 </script>
 <style lang="scss" scoped>
 .keyboard {

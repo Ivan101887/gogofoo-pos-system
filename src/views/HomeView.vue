@@ -320,9 +320,11 @@ export default defineComponent({
       () => currentSearch.value.value || currentChange.value[currentKey.value] || '',
     );
     const handleClick = (event) => {
-      console.log(event.target);
-      if (event.target.classList.contains('van-key')) return;
-      console.log('tete');
+      if (
+        event.target.classList.contains('van-key')
+        || event.target.tagName.toLowerCase() === 'input'
+      ) return;
+      console.log('tee');
       recoverCurrentSearch();
       recoverCurrentChange();
     };
@@ -348,10 +350,16 @@ export default defineComponent({
             searchMember.value = new Customer();
             break;
           // no default
+          default:
+            break;
         }
         recoverCurrentSearch();
       }
-      currentSearch.value = item as SearchItem;
+      if (item.key === searchKey.product) {
+        currentSearch.value = item as SearchItem;
+      } else {
+        recoverCurrentSearch();
+      }
     };
     const setCurrentChange = (item, key = ''): void => {
       currentChange.value = item as IShoppingItem;
@@ -459,7 +467,6 @@ export default defineComponent({
     /** 傳入計算機元件，透過面板更新輸入 */
     const shoppingList = reactive<IShoppingItem[]>([]);
     const inputFromPanel = (value: string) => {
-      console.log(currentKey.value, currentSearch.value);
       if (currentKey.value) {
         const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
         if (idx !== -1) {
@@ -469,7 +476,6 @@ export default defineComponent({
       }
       if (currentSearch.value) {
         currentSearch.value.value = value as string;
-        console.log(currentSearch.value.value);
       }
     };
 
