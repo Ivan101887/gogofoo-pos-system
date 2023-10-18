@@ -2,7 +2,7 @@
 /* eslint-disable import/no-unresolved */
 import { createApp } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faMagnifyingGlass, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faUser, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import JsonCSV from 'vue-json-csv';
 import axios from 'axios';
@@ -16,7 +16,7 @@ import '@/assets/scss/all.scss';
 import '@/assets/scss/helper/button.scss';
 import 'vant/lib/index.css';
 
-library.add(faMagnifyingGlass, faUser);
+library.add(faMagnifyingGlass, faUser, faTrashCan);
 createApp(App)
   .use(VueAxios, axios)
   .use(store)

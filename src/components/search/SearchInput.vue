@@ -1,22 +1,30 @@
 <template>
   <!-- 商品檢索的入框 -->
-  <label :for="searchItem.key" class="itemLabel flex items-center gap-2 grow">
-    <font-awesome-icon class="itemLabel__icon" :icon="['fas', 'magnifying-glass']" size="sm" />
+  <label
+    :for="item.key"
+    class="itemLabel flex items-center gap-2 grow bg-white rounded-2xl py-2.5 px-5
+        font-semibold shadow-lg shadow-[#35385a1f]
+    "
+  >
+    <slot name="prefix"></slot>
     <input
-      :name="searchItem.key"
-      class="itemLabel__input outline-0 bg-transparent grow border-b-2 border-neutral-400"
+      :name="item.key"
+      class="
+        itemLabel__input outline-0 bg-transparent
+        grow text-3xl
+      "
+      :class="[item.key === searchKey.user ? 'text-gray-500' : '']"
       type="text"
       v-model="item.value"
       :placeholder="placeholder"
       :inputmode="item.key === searchKey.user ? 'none' : 'text'"
-      @focus.stop="onFocus(searchItem)"
-    />
-      <!-- @focus="fnSetCurrent(searchItem)" -->
-    <slot name="operate"></slot>
+      @focus="fnSetCurrent(item)"
+      />
+    <slot name="suffix"></slot>
   </label>
   <!-- 商品檢索結果 -->
   <div
-    v-if="searchItem.isShowResult"
+    v-if="item.isShowResult"
     class="absolute w-full top-[46px] left-0 bg-sky-50 h-80 overflow-y-auto"
   >
     <Component :is="component" v-bind="$attrs" />
@@ -117,7 +125,6 @@ export default defineComponent({
   &__search,
   &__icon,
   &__input {
-
     display: block;
   }
 }

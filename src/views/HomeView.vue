@@ -2,50 +2,40 @@
   <!-- 主畫面 -->
   <div class="main flex flex-auto w-full h-[calc(100vh-44px)]">
     <!-- 主畫面左半邊 -->
-    <section class="main__head cashier relative flex flex-col w-3/5">
-      <div class="cashier__head p-2.5 bg-[#D9D9D9]">
+    <section class="main__head cashier relative flex flex-col w-3/5 bg-sky-200">
+      <div class="cashier__head py-2.5 px-5">
         <SearchInput
           :searchItem="searchItemProduct"
           :error-message="searchProductErrorMessage"
           :is-show-loading="currentSearch.isShowLoading"
           :is-search-error="currentSearch.isSearchError"
-          placeholder="商品名稱或編號"
+          placeholder="輸入產品編號或名稱"
           :result="productList"
           :fn-set-current="setCurrentSearch"
           :fn-search="apiHandler"
           :can-modify="canModify"
           @add-to-cart="addToCart"
         >
-          <template #operate>
-            <button class="bg-blue-800 px-1 text-white" @click="checkAuthorization">
-              修改單價
-            </button>
-          </template>
         </SearchInput>
       </div>
       <!-- 當筆訂單的所購商品 -->
-      <div class="cashier__body h-1/2 border-b border-slate-300 border-solid overflow-y-auto">
+      <div class="cashier__body h-4/5 border-b border-slate-300 border-solid
+          flex flex-col justify-between px-5 py-2.5 gap-3 overflow-y-auto
+        "
+      >
         <ShoppingList
           :shopping-list="shoppingList"
           :focus-on-el="setCurrentChange"
           :canModify="canModify"
+          :total="totalBeforeDiscount"
           @removeItem="removeFromCart"
         />
       </div>
       <div :class="[
-          'cashier__foot grow flex flex-col gap-2 px-5 py-3',
+          'cashier__foot grow flex gap-2 px-5 py-3 shrink-0 flex-wrap justify-between',
           {'cashier__foot--modal': !shoppingList.length}
         ]
       ">
-        <div class="flex gap-5 items-center">
-          <p class="text-xl w-[150px]">
-            折扣前訂單總額:
-          </p>
-          <p class="block grow text-xl p-2 pr-5 text-right"
-          >
-            {{ totalBeforeDiscount }}
-          </p>
-        </div>
         <label for="totalPercentage" class="flex gap-5 items-center">
           <p class="text-xl w-[150px]">
             折扣:
@@ -116,7 +106,7 @@
             {{ orderTotal }}
           </p>
         </div>
-        <div class="mt-12 flex items-end justify-end w-full gap-2">
+        <div class="flex items-end justify-end w-full gap-2">
           <p class="text-xl">
             <button type="button"
               class="
@@ -142,26 +132,33 @@
       </div>
     </section>
     <!-- 主畫面右半邊 -->
-    <div class="main__body container relative flex flex-col w-2/5">
-      <section class="container__head bg-[#D9D9D9] p-2.5">
+    <div class="main__body container relative flex flex-col w-2/5 bg-gray-50">
+      <section class="container__head py-2.5 px-5">
         <SearchInput
           :searchItem="searchItemUser"
           :result="searchMember"
           :is-show-loading="currentSearch.isShowLoading"
           :is-search-error="currentSearch.isSearchError"
           :error-message="searchUserErrorMessage"
-          placeholder="輸入手機號碼查詢會員資料"
+          placeholder="客戶編號"
           :fn-set-current="setCurrentSearch"
           :fn-search="apiHandler"
           @set-order-member="setOrderMember"
-        />
+        >
+          <template #prefix>
+            <font-awesome-icon
+              class="itemLabel__icon text-gray-600"
+              :icon="['fas', 'magnifying-glass']"
+              size="xl"
+            />
+          </template>
+        </SearchInput>
       </section>
       <section class="container__body grow">
         <OrderCustomer :customer="memberInfo" />
       </section>
       <section class="container__foot h-3/5">
-        <!-- <Calculator :now-value="nowValueForPanel" :update-value="inputFromPanel" /> -->
-        <Keyboard :update-value="inputFromPanel" />
+        <Keyboard :update-value="inputFromPanel" :fn-get-reset="setResetFunction" />
       </section>
     </div>
   </div>
@@ -301,6 +298,10 @@ export default defineComponent({
   setup(props, { emit }) {
     /** 會員搜尋 */
     const isShowModal = ref(false);
+    const resetKeyboardVal = ref<null |(() => void)>(null);
+    const setResetFunction = (func: (() => void)) : void => {
+      resetKeyboardVal.value = func;
+    };
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
     const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
     const currentChange = ref<IShoppingItem>(new IShoppingItem());
@@ -324,7 +325,6 @@ export default defineComponent({
         event.target.classList.contains('van-key')
         || event.target.tagName.toLowerCase() === 'input'
       ) return;
-      console.log('tee');
       recoverCurrentSearch();
       recoverCurrentChange();
     };
@@ -341,6 +341,9 @@ export default defineComponent({
     const productList = reactive<IProductSpec[]>([]);
     const searchMember = ref<Customer>(new Customer());
     const setCurrentSearch = (item) => {
+      if (resetKeyboardVal.value) {
+        resetKeyboardVal.value();
+      }
       if (currentSearch.value.key !== item.key) {
         switch (item.key) {
           case searchKey.product:
@@ -355,11 +358,7 @@ export default defineComponent({
         }
         recoverCurrentSearch();
       }
-      if (item.key === searchKey.product) {
-        currentSearch.value = item as SearchItem;
-      } else {
-        recoverCurrentSearch();
-      }
+      currentSearch.value = item as SearchItem;
     };
     const setCurrentChange = (item, key = ''): void => {
       currentChange.value = item as IShoppingItem;
@@ -474,6 +473,7 @@ export default defineComponent({
         }
         return;
       }
+      if (currentSearch.value.key === searchKey.product) return;
       if (currentSearch.value) {
         currentSearch.value.value = value as string;
       }
@@ -524,8 +524,7 @@ export default defineComponent({
     const payCash = ref(0);
     const shoppingItemTotal = computed(() => shoppingList.map((order) => Math.round(
       order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
-    )
-        - order.amount_discount));
+    ) - order.amount_discount));
     const totalBeforeDiscount = computed(
       () => shoppingItemTotal.value.reduce((acc, item) => acc + item, 0),
     );
@@ -618,7 +617,6 @@ export default defineComponent({
       currentChange,
       currentKey,
       canModify,
-      totalBeforeDiscount,
       usedEMoney,
       amountDiscount,
       percentageDiscount,
@@ -628,8 +626,9 @@ export default defineComponent({
       payment,
       canUseBonus,
       payCash,
-      createOrder,
+      totalBeforeDiscount,
       // methods
+      createOrder,
       apiHandler,
       addToCart,
       checkAuthorization,
@@ -640,6 +639,7 @@ export default defineComponent({
       setCurrentChange,
       confirmCancelOrder,
       assignPayment,
+      setResetFunction,
     };
   },
 });

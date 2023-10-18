@@ -131,7 +131,9 @@ export default defineComponent({
     </td>
     <td align="center" width="15%">{{ total }}</td>
     <td align="center" width="5%">
-      <button class="btn" @click="emit('removeItem', order.id)">移除</button>
+      <button class="btn" @click="emit('removeItem', order.id)">
+        <font-awesome-icon :icon="['fas', 'trash-can']" size="xl" class="text-rose-700" />
+      </button>
     </td>
   </tr>
 </template>
