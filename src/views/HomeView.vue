@@ -19,7 +19,7 @@
         </SearchInput>
       </div>
       <!-- 當筆訂單的所購商品 -->
-      <div class="cashier__body h-4/5 border-b border-slate-300 border-solid
+      <div class="cashier__body h-4/5
           flex flex-col justify-between px-5 py-2.5 gap-3 overflow-y-auto
         "
       >
@@ -36,8 +36,8 @@
           {'cashier__foot--modal': !shoppingList.length}
         ]
       ">
-        <label for="totalPercentage" class="flex gap-5 items-center">
-          <p class="text-xl w-[150px]">
+        <label for="totalPercentage" class="flex gap-5 items-center basis-2/5 text-xl">
+          <p class="flex-auto">
             折扣:
           </p>
           <input
@@ -46,13 +46,13 @@
             max="100"
             min="0"
             step="10"
-            class="block grow text-xl outline outline-1 p-2 rounded text-right"
+            class="block grow outline outline-1 p-2 rounded text-right"
             name="totalPercentage"
             inputmode="none"
           />
         </label>
-        <label for="totalDiscount" class="flex gap-5 items-center">
-          <p class="text-xl w-[150px]">
+        <label for="totalDiscount" class="flex gap-5 items-center basis-2/5 text-xl">
+          <p class="flex-auto">
             折價:
           </p>
           <input
@@ -61,13 +61,13 @@
             max="100"
             min="0"
             step="10"
-            class="block grow text-xl outline outline-1 p-2 rounded text-right"
+            class="block grow outline outline-1 p-2 rounded text-right"
             name="totalDiscount"
             inputmode="none"
           />
         </label>
-        <label for="totalEMoney" class="flex gap-5 items-center">
-          <p class="text-xl w-[150px]">
+        <label for="totalEMoney" class="flex gap-5 items-center basis-2/5 text-xl">
+          <p class="flex-auto">
             業務獎金:
           </p>
           <input
@@ -76,13 +76,13 @@
             max="100"
             min="0"
             step="10"
-            class="block grow text-xl outline outline-1 p-2 rounded text-right"
+            class="block grow outline outline-1 p-2 rounded text-right"
             name="totalEMoney"
             inputmode="none"
           />
         </label>
-        <label for="totalBonus" class="flex gap-5 items-center">
-          <p class="text-xl w-[150px]">
+        <label for="totalBonus" class="flex gap-5 items-center basis-2/5 text-xl">
+          <p class="flex-auto">
             購物金:
           </p>
           <input
@@ -92,18 +92,18 @@
             max="100"
             min="0"
             step="10"
-            class="block grow text-xl outline outline-1 p-2 rounded text-right"
+            class="block grow outline outline-1 p-2 rounded text-right"
             name="totalBonus"
             inputmode="none"
           />
         </label>
-        <div class="flex gap-5 items-center">
-          <p class="text-xl w-[150px]">
+        <div class="flex gap-5 items-center grow text-2xl">
+          <p class="">
             折扣後總金額:
           </p>
-          <p class="grow text-xl p-2 pr-5 text-right"
+          <p class="grow p-2 pr-5 text-right"
           >
-            {{ orderTotal }}
+            {{ numberThousand(orderTotal) }}
           </p>
         </div>
         <div class="flex items-end justify-end w-full gap-2">
@@ -172,7 +172,7 @@
         <p class="text-5xl flex">
           總金額:
           <span class="grow text-end">
-            {{ orderTotal }}
+            {{ numberThousand(orderTotal) }}
           </span>
         </p>
       </div>
@@ -194,7 +194,7 @@
         <p class="text-5xl flex">
           找零:
           <span class="grow text-end">
-            {{ payCash > 0 ? orderTotal - payCash : 0 }}
+            {{ numberThousand(payCash > 0 ? orderTotal - payCash : 0) }}
           </span>
         </p>
       </div>
@@ -301,6 +301,13 @@ export default defineComponent({
     const resetKeyboardVal = ref<null |(() => void)>(null);
     const setResetFunction = (func: (() => void)) : void => {
       resetKeyboardVal.value = func;
+    };
+    const numberThousand = (number: number): string => {
+      if (number === undefined || Number.isNaN(number)) {
+        return '-';
+      }
+      const regExpInfo = /(\d{1,3})(?=(\d{3})+(?:$|\.))/g;
+      return `${number.toString().replace(regExpInfo, '$1,')}`;
     };
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
     const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
@@ -640,6 +647,7 @@ export default defineComponent({
       confirmCancelOrder,
       assignPayment,
       setResetFunction,
+      numberThousand,
     };
   },
 });

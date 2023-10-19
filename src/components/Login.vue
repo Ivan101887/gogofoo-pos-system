@@ -92,7 +92,7 @@ export default {
 <style lang="scss" scoped>
 .modal {
   // position
-  @apply fixed top-0 left-0;
+  @apply fixed top-0 left-0 z-[100];
   // size
   @apply w-[100%] h-[100%];
   // display
