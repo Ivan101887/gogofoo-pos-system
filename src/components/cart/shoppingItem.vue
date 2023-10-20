@@ -81,6 +81,7 @@ export default defineComponent({
           :name="editField.price"
           v-model="order[editField.price]"
           min="0"
+          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           :max="maxPrice"
           inputmode="none"
           @focus="focusOnEl(order, editField.price)"
@@ -97,6 +98,7 @@ export default defineComponent({
           :name="editField.count"
           v-model="order[editField.count]"
           inputmode="none"
+          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           min="1"
           @focus="focusOnEl(order, editField.count)"
         />
@@ -110,6 +112,7 @@ export default defineComponent({
           v-model="order[editField.discount]"
           max="100"
           min="0"
+          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           step="5"
           inputmode="none"
           @focus="focusOnEl(order, editField.discount)"
@@ -124,6 +127,7 @@ export default defineComponent({
           v-model="order[editField.coupon]"
           min="0"
           step="10"
+          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           inputmode="none"
           @focus="focusOnEl(order, editField.coupon)"
         />
