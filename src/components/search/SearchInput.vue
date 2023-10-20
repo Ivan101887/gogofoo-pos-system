@@ -6,37 +6,39 @@
         font-semibold shadow-lg shadow-[#35385a1f]
     "
   >
+  <div class="order-first">
     <slot name="prefix"></slot>
+  </div>
+  <div class="order-last shrink-0">
+    <slot name="suffix"></slot>
+  </div>
     <input
       :name="item.key"
-      class="
-        itemLabel__input outline-0 bg-transparent
-        grow text-3xl
-      "
+      class="block outline-0 bg-transparent text-3xl w-4/5 grow shrink"
       :class="[item.key === searchKey.user ? 'text-gray-500' : '']"
       type="text"
       v-model="item.value"
       :placeholder="placeholder"
       :inputmode="item.key === searchKey.user ? 'none' : 'text'"
       @focus="fnSetCurrent(item)"
-      />
-    <slot name="suffix"></slot>
+    />
   </label>
   <!-- 商品檢索結果 -->
   <div
-    v-if="item.isShowResult"
-    class="absolute w-full top-[46px] left-0 bg-sky-50 h-80 overflow-y-auto"
+    v-if="item.isShowResult && item.key === searchKey.product"
+    class="absolute w-full top-full mt-2 bg-sky-300 z-[101]
+      overflow-y-auto shadow-lg shadow-[#35385a1f] rounded-2xl h-[430px]
+    "
   >
-    <Component :is="component" v-bind="$attrs" />
+    <SearchList class="p-4" v-bind="$attrs" />
   </div>
 </template>
 
 <script lang="ts">
 import {
-  defineComponent, PropType, reactive, computed, watchEffect,
+  defineComponent, PropType, reactive, watchEffect,
 } from 'vue';
 import SearchList from './searchList.vue';
-import SearchUser from './SearchUser.vue';
 
 class Item {
   key = '';
@@ -64,7 +66,7 @@ class Item {
   }
 }
 export default defineComponent({
-  components: { SearchList, SearchUser },
+  components: { SearchList },
   props: {
     /** @param {Object} searchItem - 搜尋框的物件  */
     searchItem: {
@@ -91,10 +93,11 @@ export default defineComponent({
     // eslint-disable-next-line no-shadow
     enum searchKey {
       product = 'product',
-      user = 'User',
+      user = 'user',
     }
     const item = reactive(props.searchItem);
     watchEffect(async () => {
+      if (item.key === searchKey.user) return;
       if (!item.value) {
         item.isShowLoading = false;
         item.isShowResult = false;
@@ -105,14 +108,11 @@ export default defineComponent({
       item.isShowLoading = true;
       await props.fnSearch(item);
     });
-    const component = computed(() => (props.searchItem.key === 'product' ? 'SearchList' : 'SearchUser'));
     const onFocus = (obj) : void => {
-      console.log('test');
       props.fnSetCurrent(obj);
     };
     return {
       item,
-      component,
       searchKey,
       onFocus,
     };

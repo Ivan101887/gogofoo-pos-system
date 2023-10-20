@@ -72,7 +72,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <tr>
+  <tr class="even:bg-cyan-100 px-2 py-2.5">
     <td align="center" width="25%">{{ order['product_name'] }}</td>
     <td align="center" width="15%">
       <label v-if="canModify" :for="editField.price">
@@ -146,5 +146,8 @@ input {
   display: block;
   width: 100%;
   text-align: center;
+}
+input {
+  @apply bg-transparent;
 }
 </style>

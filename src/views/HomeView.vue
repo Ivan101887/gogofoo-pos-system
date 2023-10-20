@@ -1,9 +1,9 @@
 <template>
   <!-- 主畫面 -->
-  <div class="main flex flex-auto w-full h-[calc(100vh-44px)]">
+  <div class="main flex flex-auto w-full h-[calc(100vh-44px)]" @click="handleClick">
     <!-- 主畫面左半邊 -->
-    <section class="main__head cashier relative flex flex-col w-3/5 bg-sky-200">
-      <div class="cashier__head py-2.5 px-5">
+    <section class="main__head cashier flex flex-col w-3/5 bg-sky-200">
+      <div class="cashier__head relative my-2.5 mx-5">
         <SearchInput
           :searchItem="searchItemProduct"
           :error-message="searchProductErrorMessage"
@@ -29,7 +29,13 @@
           :canModify="canModify"
           :total="totalBeforeDiscount"
           @removeItem="removeFromCart"
-        />
+        >
+        <template #modify>
+          <button type="button" class="btn" @click="checkAuthorization">
+            <font-awesome-icon :icon="['fas', 'file-pen']" size="lg" class="text-rose-700" />
+          </button>
+        </template>
+        </ShoppingList>
       </div>
       <div :class="[
           'cashier__foot grow flex gap-2 px-5 py-3 shrink-0 flex-wrap justify-between',
@@ -132,30 +138,42 @@
       </div>
     </section>
     <!-- 主畫面右半邊 -->
-    <div class="main__body container relative flex flex-col w-2/5 bg-gray-50">
-      <section class="container__head py-2.5 px-5">
-        <SearchInput
-          :searchItem="searchItemUser"
-          :result="searchMember"
+    <div class="main__body container flex flex-col w-2/5 bg-gray-50">
+      <section class="container__head">
+        <div class="cashier__head relative m-2">
+          <SearchInput
+            :searchItem="searchItemUser"
+            placeholder="客戶編號"
+            :fn-set-current="setCurrentSearch"
+          >
+            <template #prefix>
+              <font-awesome-icon
+                class="itemLabel__icon text-gray-600"
+                :icon="['fas', 'magnifying-glass']"
+                size="xl"
+              />
+            </template>
+            <template #suffix>
+              <button
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+                @click.stop="apiHandler(searchItemUser)"
+              >
+                搜尋
+            </button>
+            </template>
+          </SearchInput>
+        </div>
+      </section>
+      <section
+        class="container__body grow m-2"
+      >
+        <OrderCustomer
+          :customer="memberInfo"
+          :is-show-result="searchItemUser.isShowResult"
           :is-show-loading="currentSearch.isShowLoading"
           :is-search-error="currentSearch.isSearchError"
           :error-message="searchUserErrorMessage"
-          placeholder="客戶編號"
-          :fn-set-current="setCurrentSearch"
-          :fn-search="apiHandler"
-          @set-order-member="setOrderMember"
-        >
-          <template #prefix>
-            <font-awesome-icon
-              class="itemLabel__icon text-gray-600"
-              :icon="['fas', 'magnifying-glass']"
-              size="xl"
-            />
-          </template>
-        </SearchInput>
-      </section>
-      <section class="container__body grow">
-        <OrderCustomer :customer="memberInfo" />
+        />
       </section>
       <section class="container__foot h-3/5">
         <Keyboard :update-value="inputFromPanel" :fn-get-reset="setResetFunction" />
@@ -240,7 +258,7 @@
 
 <script lang="ts">
 import {
-  defineComponent, ref, reactive, computed, onMounted, PropType,
+  defineComponent, ref, reactive, computed, PropType,
 } from 'vue';
 import {
   getSpecWithSerialNumber,
@@ -310,12 +328,12 @@ export default defineComponent({
       return `${number.toString().replace(regExpInfo, '$1,')}`;
     };
     const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
-    const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
+    const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user, '09'));
     const currentChange = ref<IShoppingItem>(new IShoppingItem());
     const currentSearch = ref<SearchItem>(new SearchItem());
     const currentKey = ref<string>('');
     const recoverCurrentSearch = (): void => {
-      currentSearch.value.value = '';
+      currentSearch.value.value = currentSearch.value.key === searchKey.user ? '09' : '';
       currentSearch.value.isShowResult = false;
       currentSearch.value.isShowLoading = false;
       currentSearch.value.isSearchError = false;
@@ -337,9 +355,6 @@ export default defineComponent({
     };
     /** 是否有權限修改價格 */
     const canModify = ref(false);
-    onMounted(() => {
-      window.addEventListener('click', handleClick, false);
-    });
     /** 訂單的會員資訊 */
     const memberInfo = ref<Customer>(new Customer());
     // ^元素操作
@@ -427,6 +442,12 @@ export default defineComponent({
       currentSearch.value.isShowLoading = false;
     };
     const searchUserErrorMessage = ref<string>(noticeText);
+    const setOrderMember = (member: Customer) => {
+      memberInfo.value = member;
+      recoverCurrentSearch();
+      searchUserErrorMessage.value = noticeText;
+      searchMember.value = new Customer();
+    };
     const getCustomerData = (keyword) => {
       if (phoneRegex.test(keyword)) {
         getMember({ phone: keyword })
@@ -435,6 +456,7 @@ export default defineComponent({
             searchUserErrorMessage.value = '';
             currentSearch.value.isSearchError = false;
             currentSearch.value.isShowLoading = false;
+            setOrderMember(searchMember.value);
           })
           .catch((err) => {
             searchUserErrorMessage.value = err.response.data;
@@ -453,6 +475,8 @@ export default defineComponent({
         if (content.key === searchKey.product) {
           searchProductErrorMessage.value = '請掃描條碼或輸入商品名稱';
         } else {
+          currentSearch.value.isShowResult = true;
+          currentSearch.value.isShowLoading = true;
           searchUserErrorMessage.value = noticeText;
         }
       }
@@ -468,7 +492,6 @@ export default defineComponent({
         }
       }, 500);
     };
-
     // ^控制輸入
     /** 傳入計算機元件，透過面板更新輸入 */
     const shoppingList = reactive<IShoppingItem[]>([]);
@@ -486,7 +509,7 @@ export default defineComponent({
       }
     };
 
-    // ^訂單操作
+    // ^訂單操作`
     /**
      * 加入訂單
      * @param {IProductSpec} 欲加入訂單的商品資訊
@@ -517,12 +540,6 @@ export default defineComponent({
       if (index !== -1) {
         shoppingList.splice(index, 1);
       }
-    };
-    const setOrderMember = (member: Customer) => {
-      memberInfo.value = member;
-      recoverCurrentSearch();
-      searchUserErrorMessage.value = noticeText;
-      searchMember.value = new Customer();
     };
     const usedEMoney = ref(0);
     const amountDiscount = ref(0);
@@ -640,7 +657,6 @@ export default defineComponent({
       addToCart,
       checkAuthorization,
       inputFromPanel,
-      setOrderMember,
       removeFromCart,
       setCurrentSearch,
       setCurrentChange,
@@ -648,6 +664,8 @@ export default defineComponent({
       assignPayment,
       setResetFunction,
       numberThousand,
+      getCustomerData,
+      handleClick,
     };
   },
 });

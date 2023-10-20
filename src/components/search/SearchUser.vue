@@ -1,26 +1,28 @@
 <template>
-  <div v-if="isShowLoading" class="load">
-    <Loading />
-  </div>
-  <div v-else-if="isSearchError" class="notify">
-    {{ errorMessage }}
-  </div>
-  <div v-else class="result__list" @click="emit('setOrderMember', result)">
-    <p class="result__item">會員姓名: {{ result.name }}</p>
-    <p class="result__item">電話號碼: {{ result.mobile }}</p>
+  <div
+    v-if="isShowResult"
+    class="
+      absolute w-full bg-blue-300 z-[101]
+      shadow-lg shadow-[#35385a1f] rounded-2xl h-full top-0 left-0
+    "
+  >
+    <div v-if="isShowLoading" class="load">
+      <Loading />
+    </div>
+    <div v-else-if="isSearchError" class="notify">
+      {{ errorMessage }}
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { Customer } from '../../../entities';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
-    /** 搜尋結果 */
-    result: {
-      type: Object as PropType<Customer>,
-      required: true,
+    isShowResult: {
+      type: Boolean,
+      default: false,
     },
     /** 是否搜尋中 */
     isShowLoading: {
@@ -37,17 +39,12 @@ export default defineComponent({
       default: '輸入完整手機以查詢',
     },
   },
-  setup(props, { emit }) {
-    return {
-      emit,
-    };
-  },
 });
 </script>
 
 <style lang="scss" scoped>
 .result__list {
-  @apply bg-gray-50/50 w-full cursor-pointer;
+  @apply w-full text-lg font-medium cursor-pointer;
 }
 .load {
   @apply h-full flex items-center justify-center;

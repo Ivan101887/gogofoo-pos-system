@@ -53,10 +53,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .list, .load {
-  @apply bg-gray-50/50 w-full;
+  @apply  w-full;
 }
 .load {
-  @apply h-full flex items-center justify-center ;
+  @apply h-full flex items-center justify-center bg-gray-50/50;
 }
 .notify {
   @apply text-center w-full mt-3;
