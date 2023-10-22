@@ -53,40 +53,32 @@
   </div>
 </template>
 
-<script lang="ts">
-import { reactive, ref } from 'vue';
+<script setup lang="ts">
+import {
+  reactive, ref, defineProps, defineEmits,
+} from 'vue';
 import { loginInfo as typeLoginInfo } from '../../entities';
 
-export default {
-  props: {
-    isError: {
-      type: Boolean,
-      default: false,
-    },
-    notice: {
-      type: String,
-      default: '',
-    },
+const props = defineProps({
+  isError: {
+    type: Boolean,
+    default: false,
   },
-  emit: ['login'],
-  setup(props, { emit }) {
-    const pwd = ref();
-    const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
-    const fnLogin = ():void => {
-      emit('login', loginInfo);
-    };
-    function fnFocusNext() {
-      pwd.value.focus();
-    }
-    return {
-      fnLogin,
-      loginInfo,
-      fnFocusNext,
-      emit,
-      pwd,
-    };
+  notice: {
+    type: String,
+    default: '',
   },
+});
+const emit = defineEmits(['login']);
+const pwd = ref();
+const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
+const fnLogin = ():void => {
+  emit('login', loginInfo);
 };
+function fnFocusNext() : void {
+  pwd.value.focus();
+}
+
 </script>
 
 <style lang="scss" scoped>

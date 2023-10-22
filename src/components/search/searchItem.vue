@@ -18,11 +18,6 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  setup() {
-    return {
-
-    };
-  },
 });
 </script>
 

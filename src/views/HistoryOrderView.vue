@@ -82,7 +82,6 @@ export default defineComponent({
       }
       const res:{items: IOrderDetailed[], count:number} = await getHistoryOrders(options.value);
       orders.push(...res.items);
-      console.log(res);
       totalOrders.value = res.count;
     };
     watch(nowPage, async () => {

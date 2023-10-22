@@ -35,13 +35,13 @@ const numberThousand = (number: number): string => {
       <thead class="thead w-full border-b border-solid border-b-stone-700">
         <tr class="w-full">
           <th class="p-2.5 text-lg font-semibold" width="25%">名稱</th>
-          <th class="p-2.5 text-lg font-semibold" width="15%">售價</th>
+          <th class="p-2.5 text-lg font-semibold" width="15%">售價<slot name="modify"></slot></th>
           <th class="p-2.5 text-lg font-semibold" width="12%">數量</th>
           <th class="p-2.5 text-lg font-semibold" width="12%">打折</th>
           <th class="p-2.5 text-lg font-semibold" width="15%">折扣金額</th>
           <th class="p-2.5 text-lg font-semibold" width="15%">小結</th>
           <th class="p-2.5 text-lg font-semibold" width="6%">
-            <slot name="modify"></slot>
+
           </th>
         </tr>
       </thead>

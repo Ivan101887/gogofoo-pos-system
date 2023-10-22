@@ -26,13 +26,14 @@
         <ShoppingList
           :shopping-list="shoppingList"
           :focus-on-el="setCurrentChange"
+          :search-key="currentKey"
           :canModify="canModify"
           :total="totalBeforeDiscount"
           @removeItem="removeFromCart"
         >
         <template #modify>
-          <button type="button" class="btn" @click="checkAuthorization">
-            <font-awesome-icon :icon="['fas', 'file-pen']" size="lg" class="text-rose-700" />
+          <button type="button" class="btn px-3" @click="checkAuthorization">
+            <font-awesome-icon :icon="['fas', 'exclamation']" size="lg" class="text-yellow-400" />
           </button>
         </template>
         </ShoppingList>
@@ -176,7 +177,11 @@
         />
       </section>
       <section class="container__foot h-3/5">
-        <Keyboard :update-value="inputFromPanel" :fn-get-reset="setResetFunction" />
+        <Keyboard
+          :update-value="inputFromPanel"
+          :fn-get-reset="setResetFunction"
+          :val="!currentKey ? currentSearch.value : currentChange[currentKey]"
+        />
       </section>
     </div>
   </div>
@@ -256,9 +261,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-  defineComponent, ref, reactive, computed, PropType,
+  defineProps, defineEmits, ref, reactive, computed, PropType,
 } from 'vue';
 import {
   getSpecWithSerialNumber,
@@ -305,370 +310,328 @@ const noticeText = '輸入完整手機以查詢';
 const phoneRegex = /^09\d{8}$/;
 const productSerialRegex = /^[a-zA-Z]{4}\d{7,}/;
 
-export default defineComponent({
-  props: {
-    /** @params {Array} permissionList - 權限包 */
-    permissionList: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
+const props = defineProps({
+  /** @params {Array} permissionList - 權限包 */
+  permissionList: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
-  setup(props, { emit }) {
-    /** 會員搜尋 */
-    const isShowModal = ref(false);
-    const resetKeyboardVal = ref<null |(() => void)>(null);
-    const setResetFunction = (func: (() => void)) : void => {
-      resetKeyboardVal.value = func;
-    };
-    const numberThousand = (number: number): string => {
-      if (number === undefined || Number.isNaN(number)) {
-        return '-';
-      }
-      const regExpInfo = /(\d{1,3})(?=(\d{3})+(?:$|\.))/g;
-      return `${number.toString().replace(regExpInfo, '$1,')}`;
-    };
-    const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
-    const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user, '09'));
-    const currentChange = ref<IShoppingItem>(new IShoppingItem());
-    const currentSearch = ref<SearchItem>(new SearchItem());
-    const currentKey = ref<string>('');
-    const recoverCurrentSearch = (): void => {
-      currentSearch.value.value = currentSearch.value.key === searchKey.user ? '09' : '';
-      currentSearch.value.isShowResult = false;
-      currentSearch.value.isShowLoading = false;
-      currentSearch.value.isSearchError = false;
-    };
-    const recoverCurrentChange = (): void => {
-      currentChange.value = new IShoppingItem();
-      currentKey.value = '';
-    };
-    const nowValueForPanel = computed(
-      () => currentSearch.value.value || currentChange.value[currentKey.value] || '',
-    );
-    const handleClick = (event) => {
-      if (
-        event.target.classList.contains('van-key')
-        || event.target.tagName.toLowerCase() === 'input'
-      ) return;
-      recoverCurrentSearch();
+});
+const emit = defineEmits(['updatePermissionList']);
+/** 會員搜尋 */
+const isShowModal = ref(false);
+const resetKeyboardVal = ref<null |(() => void)>(null);
+const setResetFunction = (func: (() => void)) : void => {
+  resetKeyboardVal.value = func;
+};
+const numberThousand = (number: number): string => {
+  if (number === undefined || Number.isNaN(number)) {
+    return '-';
+  }
+  const regExpInfo = /(\d{1,3})(?=(\d{3})+(?:$|\.))/g;
+  return `${number.toString().replace(regExpInfo, '$1,')}`;
+};
+const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
+const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
+const currentChange = ref<IShoppingItem>(new IShoppingItem());
+const currentSearch = ref<SearchItem>(new SearchItem());
+const currentKey = ref<string>('');
+const recoverCurrentSearch = (): void => {
+  currentSearch.value.value = '';
+  currentSearch.value.isShowResult = false;
+  currentSearch.value.isShowLoading = false;
+  currentSearch.value.isSearchError = false;
+  if (resetKeyboardVal.value) {
+    resetKeyboardVal.value();
+  }
+};
+const recoverCurrentChange = (): void => {
+  currentChange.value = new IShoppingItem();
+  currentKey.value = '';
+  if (resetKeyboardVal.value) {
+    resetKeyboardVal.value();
+  }
+};
+const handleClick = (event) => {
+  if (event.target.classList.contains('van-key')) return;
+  if (event.target.tagName.toLowerCase() === 'input') {
+    if (event.target.classList.contains('searchInput')) {
       recoverCurrentChange();
-    };
-    /** 是否有權限修改價格 */
-    const canModify = ref(false);
-    /** 訂單的會員資訊 */
-    const memberInfo = ref<Customer>(new Customer());
-    // ^元素操作
-    // ^搜尋功能
-    /** @param {IProduct[]} productList 商品的搜尋結果 */
-    const productList = reactive<IProductSpec[]>([]);
-    const searchMember = ref<Customer>(new Customer());
-    const setCurrentSearch = (item) => {
-      if (resetKeyboardVal.value) {
-        resetKeyboardVal.value();
-      }
-      if (currentSearch.value.key !== item.key) {
-        switch (item.key) {
-          case searchKey.product:
-            productList.splice(0, productList.length);
-            break;
-          case searchKey.user:
-            searchMember.value = new Customer();
-            break;
-          // no default
-          default:
-            break;
-        }
-        recoverCurrentSearch();
-      }
-      currentSearch.value = item as SearchItem;
-    };
-    const setCurrentChange = (item, key = ''): void => {
-      currentChange.value = item as IShoppingItem;
-      currentKey.value = key as string;
-    };
-    const searchProductErrorMessage = ref<string>('請掃描條碼或輸入商品名稱');
-    /**
+      return;
+    }
+    if (event.target.classList.contains('shoppingItem')) {
+      recoverCurrentSearch();
+      return;
+    }
+  }
+  recoverCurrentSearch();
+  recoverCurrentChange();
+};
+/** 是否有權限修改價格 */
+const canModify = ref(false);
+/** 訂單的會員資訊 */
+const memberInfo = ref<Customer>(new Customer());
+// ^元素操作
+// ^搜尋功能
+/** @param {IProduct[]} productList 商品的搜尋結果 */
+const productList = reactive<IProductSpec[]>([]);
+const setCurrentSearch = (item) => {
+  if (currentSearch.value.key !== item.key) {
+    switch (item.key) {
+      case searchKey.product:
+        productList.splice(0, productList.length);
+        break;
+        // no default
+      default:
+        break;
+    }
+    recoverCurrentSearch();
+  }
+  currentSearch.value = item as SearchItem;
+  currentSearch.value.value = item.value;
+};
+const setCurrentChange = (item, key = ''): void => {
+  currentChange.value = item as IShoppingItem;
+  currentKey.value = key as string;
+};
+const searchProductErrorMessage = ref<string>('請掃描條碼或輸入商品名稱');
+/**
      * 產品搜索
      * @param keyword 搜索商品關鍵字
      * @returns {void}
      */
-    const getProductList = (keyword: string) => {
-      // 搜尋前先清空陣列，以保證最終搜尋結果的正確性
-      productList.splice(0, productList.length);
-      // 如果沒有值就不搜尋了
-      if (!keyword) {
-        currentSearch.value.isShowLoading = false;
-        return;
-      }
-      /**
+const getProductList = (keyword: string) => {
+  // 搜尋前先清空陣列，以保證最終搜尋結果的正確性
+  productList.splice(0, productList.length);
+  // 如果沒有值就不搜尋了
+  if (!keyword) {
+    currentSearch.value.isShowLoading = false;
+    return;
+  }
+  /**
        * 判斷是否為流水編號
        *  -如果是流水編號就直接拿指定的商品
        *  -反之就當成關鍵字搜尋相關商品
        */
-      if (productSerialRegex.test(keyword.trim())) {
-        getSpecWithSerialNumber(keyword.trim())
-          .then((spec) => {
-            if (!spec.data.length) {
-              searchProductErrorMessage.value = '找不到相關的商品';
-              currentSearch.value.isSearchError = true;
-            }
-            productList.push(spec.data);
-          })
-          .catch((err) => {
-            console.log(err);
-            searchProductErrorMessage.value = '找不到相關的商品';
-            currentSearch.value.isSearchError = true;
-          });
-      } else {
-        getSpecListWithName({
-          q: keyword.trim(),
-          limit: 10,
-          page: 1,
-        })
-          .then((res) => {
-            if (!res.data.length) {
-              searchProductErrorMessage.value = '找不到相關的商品';
-              currentSearch.value.isSearchError = false;
-              return;
-            }
-            productList.push(...res.data);
-          })
-          .catch((err) => {
-            console.log(err);
-            searchProductErrorMessage.value = '找不到相關的商品';
-            currentSearch.value.isSearchError = true;
-          });
-      }
-      currentSearch.value.isShowLoading = false;
-    };
-    const searchUserErrorMessage = ref<string>(noticeText);
-    const setOrderMember = (member: Customer) => {
-      memberInfo.value = member;
-      recoverCurrentSearch();
+  if (productSerialRegex.test(keyword.trim())) {
+    getSpecWithSerialNumber(keyword.trim())
+      .then((spec) => {
+        if (!spec.data.length) {
+          searchProductErrorMessage.value = '找不到相關的商品';
+          currentSearch.value.isSearchError = true;
+        }
+        productList.push(spec.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        searchProductErrorMessage.value = '找不到相關的商品';
+        currentSearch.value.isSearchError = true;
+      });
+  } else {
+    getSpecListWithName({
+      q: keyword.trim(),
+      limit: 10,
+      page: 1,
+    })
+      .then((res) => {
+        if (!res.data.length) {
+          searchProductErrorMessage.value = '找不到相關的商品';
+          currentSearch.value.isSearchError = false;
+          return;
+        }
+        productList.push(...res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        searchProductErrorMessage.value = '找不到相關的商品';
+        currentSearch.value.isSearchError = true;
+      });
+  }
+  currentSearch.value.isShowLoading = false;
+};
+const searchUserErrorMessage = ref<string>(noticeText);
+const setOrderMember = (member: Customer) => {
+  memberInfo.value = member;
+  recoverCurrentSearch();
+  searchUserErrorMessage.value = noticeText;
+};
+const getCustomerData = (keyword) => {
+  if (phoneRegex.test(keyword)) {
+    getMember({ phone: keyword })
+      .then((res) => {
+        searchUserErrorMessage.value = '';
+        currentSearch.value.isSearchError = false;
+        currentSearch.value.isShowLoading = false;
+        setOrderMember(res.data);
+      })
+      .catch((err) => {
+        searchUserErrorMessage.value = err.response.data;
+        currentSearch.value.isShowLoading = false;
+        currentSearch.value.isSearchError = true;
+      });
+  }
+};
+
+// ^控制api
+/** @param {number | null} 輸入事件的debounce定時器 */
+const timeout = ref<null | number>(null);
+/** 控制搜尋的api以及各項狀態的更新 */
+const apiHandler = (content: SearchItem) => {
+  if (content.value) {
+    if (content.key === searchKey.product) {
+      searchProductErrorMessage.value = '請掃描條碼或輸入商品名稱';
+    } else {
+      currentSearch.value.isShowResult = true;
+      currentSearch.value.isShowLoading = true;
       searchUserErrorMessage.value = noticeText;
-      searchMember.value = new Customer();
-    };
-    const getCustomerData = (keyword) => {
-      if (phoneRegex.test(keyword)) {
-        getMember({ phone: keyword })
-          .then((res) => {
-            searchMember.value = res.data;
-            searchUserErrorMessage.value = '';
-            currentSearch.value.isSearchError = false;
-            currentSearch.value.isShowLoading = false;
-            setOrderMember(searchMember.value);
-          })
-          .catch((err) => {
-            searchUserErrorMessage.value = err.response.data;
-            currentSearch.value.isShowLoading = false;
-            currentSearch.value.isSearchError = true;
-          });
-      }
-    };
+    }
+  }
+  // 輸入後都重新計時
+  if (timeout.value) {
+    clearTimeout(timeout.value);
+  }
+  timeout.value = setTimeout(() => {
+    if (content.key === searchKey.product) {
+      getProductList(content.value);
+    } else {
+      getCustomerData(content.value);
+    }
+  }, 500);
+};
+// ^控制輸入
+/** 傳入計算機元件，透過面板更新輸入 */
+const shoppingList = reactive<IShoppingItem[]>([]);
+const inputFromPanel = (value: string) : void => {
+  if (currentKey.value) {
+    const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
+    if (idx < 0) return;
+    shoppingList[idx][currentKey.value] = value;
+    return;
+  }
+  if (currentSearch.value.key === searchKey.product) return;
+  if (currentSearch.value) {
+    currentSearch.value.value = value as string;
+  }
+};
 
-    // ^控制api
-    /** @param {number | null} 輸入事件的debounce定時器 */
-    const timeout = ref<null | number>(null);
-    /** 控制搜尋的api以及各項狀態的更新 */
-    const apiHandler = (content: SearchItem) => {
-      if (content.value) {
-        if (content.key === searchKey.product) {
-          searchProductErrorMessage.value = '請掃描條碼或輸入商品名稱';
-        } else {
-          currentSearch.value.isShowResult = true;
-          currentSearch.value.isShowLoading = true;
-          searchUserErrorMessage.value = noticeText;
-        }
-      }
-      // 輸入後都重新計時
-      if (timeout.value) {
-        clearTimeout(timeout.value);
-      }
-      timeout.value = setTimeout(() => {
-        if (content.key === searchKey.product) {
-          getProductList(content.value);
-        } else {
-          getCustomerData(content.value);
-        }
-      }, 500);
-    };
-    // ^控制輸入
-    /** 傳入計算機元件，透過面板更新輸入 */
-    const shoppingList = reactive<IShoppingItem[]>([]);
-    const inputFromPanel = (value: string) => {
-      if (currentKey.value) {
-        const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
-        if (idx !== -1) {
-          shoppingList[idx][currentKey.value] = value;
-        }
-        return;
-      }
-      if (currentSearch.value.key === searchKey.product) return;
-      if (currentSearch.value) {
-        currentSearch.value.value = value as string;
-      }
-    };
-
-    // ^訂單操作`
-    /**
+// ^訂單操作`
+/**
      * 加入訂單
      * @param {IProductSpec} 欲加入訂單的商品資訊
      * @return {void}
      */
-    const addToCart = (product: IProductSpec) => {
-      const shoppingItem: IShoppingItem = {
-        id: product.id,
-        product_name: product.product_name + product.spec_name,
-        serial_number: product.serial_number,
-        purchase_count: 1,
-        price_per_unit: product.price_per_unit,
-        percentage_discount: 100,
-        amount_discount: 0,
-      };
-      const index = shoppingList.findIndex(
-        (item) => item.serial_number === shoppingItem.serial_number,
-      );
-      if (index === -1) {
-        shoppingList.push(shoppingItem);
-      } else {
-        shoppingList[index].purchase_count += 1;
-      }
-      recoverCurrentSearch();
-    };
-    const removeFromCart = (id: number) => {
-      const index = shoppingList.findIndex((item) => item.id === id);
-      if (index !== -1) {
-        shoppingList.splice(index, 1);
-      }
-    };
-    const usedEMoney = ref(0);
-    const amountDiscount = ref(0);
-    const percentageDiscount = ref(100);
-    const usedBonus = ref(0);
-    const payCash = ref(0);
-    const shoppingItemTotal = computed(() => shoppingList.map((order) => Math.round(
-      order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
-    ) - order.amount_discount));
-    const totalBeforeDiscount = computed(
-      () => shoppingItemTotal.value.reduce((acc, item) => acc + item, 0),
-    );
-    const orderTotal = computed(
-      () => Math.round(
-        totalBeforeDiscount.value * (percentageDiscount.value / 100),
-      ) - amountDiscount.value - usedEMoney.value - usedBonus.value,
-    );
-    const canUseBonus = computed(
-      () => totalBeforeDiscount.value > memberInfo.value.emoney_denominator,
-    );
-    const orderAuthorizedId = ref(0);
-    const checkAuthorization = () => {
-      if (props.permissionList.includes(permission.changePrice)) {
-        canModify.value = true;
-        return;
-      }
-      const code = prompt('輸入驗證碼以授權');
-      if (code === null) return;
-      getAuthorization({ code })
-        .then((res) => {
-          canModify.value = true;
-          orderAuthorizedId.value = res.data.id;
-          emit('updatePermissionList', permission.changePrice);
-        })
-        .catch((err) => {
-          console.log(err);
-          alert('取得權限失敗，請重新確認');
-        });
-    };
-    const taxNumber = ref('');
-    const payment = ref('');
-    const resetData = () => {
-      shoppingList.splice(0);
-      usedBonus.value = 0;
-      usedEMoney.value = 0;
-      percentageDiscount.value = 100;
-      amountDiscount.value = 0;
-      payment.value = '';
-      memberInfo.value = new Customer();
-      taxNumber.value = '';
-      payCash.value = 0;
-      payment.value = '';
-      isShowModal.value = false;
-    };
-    const createOrder = async () => {
-      const apiData = {
-        mobile: memberInfo.value.mobile,
-        used_e_money: usedEMoney.value,
-        used_bonus: usedBonus.value,
-        payment_method: payment.value,
-        tax_number: taxNumber.value,
-        percentage_discount: percentageDiscount.value,
-        amount_discount: amountDiscount.value,
-        auth_event_id: orderAuthorizedId.value,
-        items: [...shoppingList],
-      };
-      try {
-        const res = await createNewOrder(apiData);
-        window.alert(`成功建立訂單${res}`);
-        resetData();
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    const confirmCancelOrder = () => {
-      const confirm = window.confirm('message');
-      if (!confirm) return;
-      resetData();
-    };
-    const assignPayment = async (pay) => {
-      if (!payCash.value) {
-        payCash.value = orderTotal.value;
-      }
-      payment.value = pay;
-      await createOrder();
-    };
-    return {
-      // data
-      isShowModal,
-      searchItemProduct,
-      searchItemUser,
-      productList,
-      shoppingList,
-      searchMember,
-      searchProductErrorMessage,
-      searchUserErrorMessage,
-      memberInfo,
-      currentSearch,
-      currentChange,
-      currentKey,
-      canModify,
-      usedEMoney,
-      amountDiscount,
-      percentageDiscount,
-      usedBonus,
-      orderTotal,
-      nowValueForPanel,
-      payment,
-      canUseBonus,
-      payCash,
-      totalBeforeDiscount,
-      // methods
-      createOrder,
-      apiHandler,
-      addToCart,
-      checkAuthorization,
-      inputFromPanel,
-      removeFromCart,
-      setCurrentSearch,
-      setCurrentChange,
-      confirmCancelOrder,
-      assignPayment,
-      setResetFunction,
-      numberThousand,
-      getCustomerData,
-      handleClick,
-    };
-  },
-});
+const addToCart = (product: IProductSpec) => {
+  const shoppingItem: IShoppingItem = {
+    id: product.id,
+    product_name: product.product_name + product.spec_name,
+    serial_number: product.serial_number,
+    purchase_count: 1,
+    price_per_unit: product.price_per_unit,
+    percentage_discount: 100,
+    amount_discount: 0,
+  };
+  const index = shoppingList.findIndex(
+    (item) => item.serial_number === shoppingItem.serial_number,
+  );
+  if (index === -1) {
+    shoppingList.push(shoppingItem);
+  } else {
+    shoppingList[index].purchase_count += 1;
+  }
+  recoverCurrentSearch();
+};
+const removeFromCart = (id: number) => {
+  const index = shoppingList.findIndex((item) => item.id === id);
+  if (index !== -1) {
+    shoppingList.splice(index, 1);
+  }
+};
+const usedEMoney = ref(0);
+const amountDiscount = ref(0);
+const percentageDiscount = ref(100);
+const usedBonus = ref(0);
+const payCash = ref(0);
+const shoppingItemTotal = computed(() => shoppingList.map((order) => Math.round(
+  order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
+) - order.amount_discount));
+const totalBeforeDiscount = computed(
+  () => shoppingItemTotal.value.reduce((acc, item) => acc + item, 0),
+);
+const orderTotal = computed(
+  () => Math.round(
+    totalBeforeDiscount.value * (percentageDiscount.value / 100),
+  ) - amountDiscount.value - usedEMoney.value - usedBonus.value,
+);
+const canUseBonus = computed(
+  () => totalBeforeDiscount.value > memberInfo.value.emoney_denominator,
+);
+const orderAuthorizedId = ref(0);
+const checkAuthorization = () => {
+  if (props.permissionList.includes(permission.changePrice)) {
+    canModify.value = true;
+    return;
+  }
+  const code = prompt('輸入驗證碼以授權');
+  if (code === null) return;
+  getAuthorization({ code })
+    .then((res) => {
+      canModify.value = true;
+      orderAuthorizedId.value = res.data.id;
+      emit('updatePermissionList', permission.changePrice);
+    })
+    .catch((err) => {
+      console.log(err);
+      alert('取得權限失敗，請重新確認');
+    });
+};
+const taxNumber = ref('');
+const payment = ref('');
+const resetData = () => {
+  shoppingList.splice(0);
+  usedBonus.value = 0;
+  usedEMoney.value = 0;
+  percentageDiscount.value = 100;
+  amountDiscount.value = 0;
+  payment.value = '';
+  memberInfo.value = new Customer();
+  taxNumber.value = '';
+  payCash.value = 0;
+  payment.value = '';
+  isShowModal.value = false;
+};
+const createOrder = async () => {
+  const apiData = {
+    mobile: memberInfo.value.mobile,
+    used_e_money: usedEMoney.value,
+    used_bonus: usedBonus.value,
+    payment_method: payment.value,
+    tax_number: taxNumber.value,
+    percentage_discount: percentageDiscount.value,
+    amount_discount: amountDiscount.value,
+    auth_event_id: orderAuthorizedId.value,
+    items: [...shoppingList],
+  };
+  try {
+    const res = await createNewOrder(apiData);
+    window.alert(`成功建立訂單${res}`);
+    resetData();
+  } catch (e) {
+    console.log(e);
+  }
+};
+const confirmCancelOrder = () => {
+  const confirm = window.confirm('message');
+  if (!confirm) return;
+  resetData();
+};
+const assignPayment = async (pay) => {
+  if (!payCash.value) {
+    payCash.value = orderTotal.value;
+  }
+  payment.value = pay;
+  await createOrder();
+};
+
 </script>
 <style lang="scss" scoped>
   .cashier {

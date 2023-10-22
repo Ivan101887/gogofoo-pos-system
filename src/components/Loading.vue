@@ -15,10 +15,6 @@
   </div>
 </template>
 
-<script>
-export default {};
-</script>
-
 <style lang="scss" scoped>
 .loading{
   @apply flex justify-center absolute w-full;

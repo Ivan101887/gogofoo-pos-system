@@ -3,9 +3,10 @@
     <van-number-keyboard
       theme="custom"
       :extra-key="['00', '.']"
-      :show="true"
+      show
       @input="onInput"
       @delete="onDelete"
+      @close="enter"
     >
     </van-number-keyboard>
   </div>
@@ -17,6 +18,10 @@ import {
 } from 'vue';
 
 const props = defineProps({
+  val: {
+    type: String,
+    default: '',
+  },
   updateValue: {
     type: Function,
     default: null,
@@ -25,9 +30,20 @@ const props = defineProps({
     type: Function,
     default: null,
   },
+  fnEnter: {
+    type: Function,
+    default: null,
+  },
 });
-const value = ref('');
+const value = ref(props.val);
+const enter = (e) : void => {
+  const { fnEnter } = props;
+  if (!fnEnter) return;
+  fnEnter();
+  console.log(e, 111);
+};
 const onInput = (v) : void => {
+  value.value = props.val;
   if (value.value) {
     value.value += `${v}`;
     return;

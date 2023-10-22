@@ -15,29 +15,27 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { defineProps } from 'vue';
 
-export default defineComponent({
-  props: {
-    isShowResult: {
-      type: Boolean,
-      default: false,
-    },
-    /** 是否搜尋中 */
-    isShowLoading: {
-      type: Boolean,
-      default: false,
-    },
-    /** 搜尋是否錯誤 */
-    isSearchError: {
-      type: Boolean,
-      default: false,
-    },
-    errorMessage: {
-      type: String,
-      default: '輸入完整手機以查詢',
-    },
+const props = defineProps({
+  isShowResult: {
+    type: Boolean,
+    default: false,
+  },
+  /** 是否搜尋中 */
+  isShowLoading: {
+    type: Boolean,
+    default: false,
+  },
+  /** 搜尋是否錯誤 */
+  isSearchError: {
+    type: Boolean,
+    default: false,
+  },
+  errorMessage: {
+    type: String,
+    default: '輸入完整手機以查詢',
   },
 });
 </script>

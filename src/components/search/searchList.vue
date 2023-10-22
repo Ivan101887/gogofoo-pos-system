@@ -12,41 +12,35 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { defineEmits, defineProps, PropType } from 'vue';
 import type { IProductSpec } from '../../../entities';
 
-export default defineComponent({
-  props: {
-    /** @params {String} errorMessage - 錯誤訊息 */
-    errorMessage: {
-      type: String,
-      default: '請掃描條碼或輸入商品名稱',
-    },
-    /** @params {Array} result -  搜尋結果 */
-    result: {
-      type: Array as PropType<IProductSpec[]>,
-      default: () => [],
-    },
-    /** @params {Boolean} isShowLoading - 搜尋的loading畫面 */
-    isShowLoading: {
-      type: Boolean,
-      default: true,
-    },
-    /** @params {Boolean} isSearchError - 搜尋失敗狀態 */
-    isSearchError: {
-      type: Boolean,
-      default: false,
-    },
+const emit = defineEmits(['addToCart']);
+/** 加入購物車 */
+const addToCart = (product: IProductSpec) => {
+  emit('addToCart', product);
+};
+const props = defineProps({
+  /** @params {String} errorMessage - 錯誤訊息 */
+  errorMessage: {
+    type: String,
+    default: '請掃描條碼或輸入商品名稱',
   },
-  setup(props, { emit }) {
-    /** 加入購物車 */
-    const addToCart = (product: IProductSpec) => {
-      emit('addToCart', product);
-    };
-    return {
-      addToCart,
-    };
+  /** @params {Array} result -  搜尋結果 */
+  result: {
+    type: Array as PropType<IProductSpec[]>,
+    default: () => [],
+  },
+  /** @params {Boolean} isShowLoading - 搜尋的loading畫面 */
+  isShowLoading: {
+    type: Boolean,
+    default: true,
+  },
+  /** @params {Boolean} isSearchError - 搜尋失敗狀態 */
+  isSearchError: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>

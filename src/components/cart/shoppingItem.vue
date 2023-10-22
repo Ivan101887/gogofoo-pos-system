@@ -1,135 +1,147 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
-  defineComponent, reactive, computed, PropType,
+  defineProps, reactive, computed, PropType, defineEmits, ref,
+  ComponentPublicInstance, watch,
 } from 'vue';
 import { IShoppingItem } from '../../../entities';
 
-export default defineComponent({
-  props: {
-    /** @params {IShoppingItem} item - 商品 */
-    item: {
-      type: Object as PropType<IShoppingItem>,
-      default: () => ({}),
-    },
-    /** @params {Boolean} canModify - 是否可以修改價格 */
-    canModify: {
-      type: Boolean,
-      default: false,
-    },
-    focusOnEl: {
-      type: Function,
-      default: null,
-    },
+const props = defineProps({
+  searchKey: {
+    type: String,
+    default: '',
   },
-  setup(props, { emit }) {
-    // eslint-disable-next-line no-shadow
-    enum editField {
+  /** @params {IShoppingItem} item - 商品 */
+  item: {
+    type: Object as PropType<IShoppingItem>,
+    default: () => ({}),
+  },
+  /** @params {Boolean} canModify - 是否可以修改價格 */
+  canModify: {
+    type: Boolean,
+    default: false,
+  },
+  focusOnEl: {
+    type: Function,
+    default: null,
+  },
+});
+type refElement = (HTMLInputElement | ComponentPublicInstance | null)
+const itemInputs = ref<Array<refElement>>([]);
+const emit = defineEmits(['removeItem']);
+// eslint-disable-next-line no-shadow
+enum editFieldName {
       discount = 'percentage_discount',
       price = 'price_per_unit',
       coupon = 'amount_discount',
       count = 'purchase_count',
     }
-    const order = reactive(props.item);
-    const maxPrice = { ...order }.price_per_unit;
-    const total = computed(() => Math.round(
-      order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
-    ) - order.amount_discount);
-    const changeValue = (e, key) => {
-      const discountBase = 100;
-      const value = parseInt(e.target.innerHTML, 10);
-      switch (key) {
-        case editField.price:
-          if (value > maxPrice || value <= 0) {
-            alert('價格設定有誤，請輸入正確的價格!!');
-          }
-          break;
-        case editField.discount:
-          if (!(value <= discountBase && value > 0)) {
-            alert('打折請輸入0-100之間');
-          }
-          break;
-        // 折讓修改
-        case editField.coupon:
-          if (value >= total.value) {
-            e.target.innerHTML = order[key];
-            alert('折扣金額不能超過總金額喔!!');
-          } else {
-            order[key] = value;
-          }
-          break;
-        // no default
+// eslint-disable-next-line no-shadow
+enum editFieldIndex {
+      price = 0,
+      count = 1,
+      discount = 2,
+      coupon = 3,
+    }
+const order = reactive(props.item);
+const maxPrice = { ...order }.price_per_unit;
+// const baseTotal = {}
+const total = computed(() => Math.round(
+  order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
+) - order.amount_discount);
+watch(order, (b, a) => {
+  const discountBase = 100;
+  const totalAfterDiscount = Math.round(
+    a.price_per_unit * a.purchase_count * (a.percentage_discount / 100),
+  );
+  switch (props.searchKey) {
+    case editFieldName.price:
+      if (a[props.searchKey] > maxPrice || a[props.searchKey] <= 0) {
+        alert(`價格設定有誤，不能超過${maxPrice}，請輸入正確的價格!!`);
+        (itemInputs.value[editFieldIndex.price] as HTMLInputElement).focus();
       }
-    };
-    return {
-      order,
-      total,
-      changeValue,
-      maxPrice,
-      editField,
-      emit,
-    };
-  },
+      break;
+    case editFieldName.discount:
+      if (!(a[props.searchKey] <= discountBase && a[props.searchKey] > 0)) {
+        alert('打折請輸入0-100之間');
+        (itemInputs.value[editFieldIndex.price] as HTMLInputElement).focus();
+      }
+      break;
+      // 折讓修改
+    case editFieldName.coupon:
+      if (a[props.searchKey] >= (totalAfterDiscount)) {
+        alert(`折扣金額不能超過${totalAfterDiscount}喔!!`);
+        (itemInputs.value[editFieldIndex.price] as HTMLInputElement).focus();
+      }
+      break;
+          // no default
+  }
 });
 </script>
 <template>
   <tr class="even:bg-cyan-100 px-2 py-2.5">
     <td align="center" width="25%">{{ order['product_name'] }}</td>
     <td align="center" width="15%">
-      <label v-if="canModify" :for="editField.price">
+      <label :for="editFieldName.price">
         <input
           type="number"
-          :name="editField.price"
-          v-model="order[editField.price]"
+          :name="editFieldName.price"
+          v-model="order[editFieldName.price]"
+          class="shoppingItem text-lg p-2"
+          :class="{ 'active-input': searchKey === editFieldName.price }"
           min="0"
-          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           :max="maxPrice"
+          :disabled="!canModify"
           inputmode="none"
-          @focus="focusOnEl(order, editField.price)"
+          @focus="focusOnEl(order, editFieldName.price)"
+          :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>
-      <div v-else>
-        {{ order[editField.price] }}
-      </div>
     </td>
     <td align="center" width="13%">
-      <label :for="editField.count">
+      <label :for="editFieldName.count">
         <input
           type="number"
-          :name="editField.count"
-          v-model="order[editField.count]"
+          :name="editFieldName.count"
+          v-model="order[editFieldName.count]"
+          class="shoppingItem text-lg p-2"
+          :class="{ 'active-input': searchKey === editFieldName.count }"
           inputmode="none"
-          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           min="1"
-          @focus="focusOnEl(order, editField.count)"
+          @focus="focusOnEl(order, editFieldName.count)"
+          :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>
     </td>
     <td align="center" width="12%">
-      <label :for="editField.discount">
+      <label :for="editFieldName.discount">
         <input
           type="number"
-          :name="editField.discount"
-          v-model="order[editField.discount]"
+          :name="editFieldName.discount"
+          v-model="order[editFieldName.discount]"
+          class="shoppingItem text-lg p-2"
+          :class="{ 'active-input': searchKey === editFieldName.discount }"
           max="100"
           min="0"
-          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           step="5"
           inputmode="none"
-          @focus="focusOnEl(order, editField.discount)"
+          @focus="focusOnEl(order, editFieldName.discount)"
+          :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>
     </td>
     <td align="center" width="15%">
-      <label :for="editField.coupon">
+      <label :for="editFieldName.coupon">
         <input
           type="number"
-          :name="editField.coupon"
-          v-model="order[editField.coupon]"
+          :name="editFieldName.coupon"
+          v-model="order[editFieldName.coupon]"
+          class="shoppingItem text-lg p-2"
+          :class="{ 'active-input': searchKey === editFieldName.coupon }"
           min="0"
           step="10"
-          class="focus:bg-blue-800 text-lg p-2 focus:text-white"
           inputmode="none"
-          @focus="focusOnEl(order, editField.coupon)"
+          @focus="focusOnEl(order, editFieldName.coupon)"
+          :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>
     </td>
@@ -152,6 +164,9 @@ input {
   text-align: center;
 }
 input {
+  &.active-input {
+    @apply bg-blue-800 text-white;
+  }
   @apply bg-transparent;
 }
 </style>

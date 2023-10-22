@@ -14,7 +14,7 @@
   </div>
     <input
       :name="item.key"
-      class="block outline-0 bg-transparent text-3xl w-4/5 grow shrink"
+      class="searchInput block outline-0 bg-transparent text-3xl w-4/5 grow shrink"
       :class="[item.key === searchKey.user ? 'text-gray-500' : '']"
       type="text"
       v-model="item.value"
@@ -108,13 +108,9 @@ export default defineComponent({
       item.isShowLoading = true;
       await props.fnSearch(item);
     });
-    const onFocus = (obj) : void => {
-      props.fnSetCurrent(obj);
-    };
     return {
       item,
       searchKey,
-      onFocus,
     };
   },
 });
