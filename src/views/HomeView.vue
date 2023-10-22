@@ -49,13 +49,16 @@
           </p>
           <input
             type="number"
-            v-model="percentageDiscount"
+            v-model.number="percentageDiscount"
             max="100"
             min="0"
             step="10"
-            class="block grow outline outline-1 p-2 rounded text-right"
+            class="operateInput
+            block grow  p-2 rounded text-right"
+            :class="{'active-operate': currentOperate === 'totalPercentage'}"
             name="totalPercentage"
             inputmode="none"
+            @focus="setCurrentOperate('totalPercentage')"
           />
         </label>
         <label for="totalDiscount" class="flex gap-5 items-center basis-2/5 text-xl">
@@ -64,18 +67,21 @@
           </p>
           <input
             type="number"
-            v-model="amountDiscount"
+            v-model.number="amountDiscount"
             max="100"
             min="0"
             step="10"
-            class="block grow outline outline-1 p-2 rounded text-right"
+            class="operateInput
+            block grow  p-2 rounded text-right"
+            :class="{'active-operate': currentOperate === 'totalDiscount'}"
             name="totalDiscount"
             inputmode="none"
+            @focus="setCurrentOperate('totalDiscount')"
           />
         </label>
         <label for="totalEMoney" class="flex gap-5 items-center basis-2/5 text-xl">
           <p class="flex-auto">
-            業務獎金:
+            回饋金:
           </p>
           <input
             type="number"
@@ -83,9 +89,12 @@
             max="100"
             min="0"
             step="10"
-            class="block grow outline outline-1 p-2 rounded text-right"
+            class="operateInput
+            block grow  p-2 rounded text-right"
+            :class="{'active-operate': currentOperate === 'totalEMoney'}"
             name="totalEMoney"
             inputmode="none"
+            @focus="setCurrentOperate('totalEMoney')"
           />
         </label>
         <label for="totalBonus" class="flex gap-5 items-center basis-2/5 text-xl">
@@ -99,9 +108,12 @@
             max="100"
             min="0"
             step="10"
-            class="block grow outline outline-1 p-2 rounded text-right"
+            class="operateInput
+            block grow  p-2 rounded text-right"
+            :class="{'active-operate': currentOperate === 'totalBonus'}"
             name="totalBonus"
             inputmode="none"
+            @focus="setCurrentOperate('totalBonus')"
           />
         </label>
         <div class="flex gap-5 items-center grow text-2xl">
@@ -121,7 +133,7 @@
                 font-bold py-4 px-6 border border-gray-300 rounded"
                 @click="confirmCancelOrder"
               >
-              取消
+              清除訂單
             </button>
           </p>
           <p class="text-xl">
@@ -132,7 +144,7 @@
                 text-white font-bold py-4 px-6 border border-blue-700 rounded"
                 @click="isShowModal = true"
               >
-              確認
+              結帳
             </button>
           </p>
         </div>
@@ -180,7 +192,7 @@
         <Keyboard
           :update-value="inputFromPanel"
           :fn-get-reset="setResetFunction"
-          :val="!currentKey ? currentSearch.value : currentChange[currentKey]"
+          :val="keyboardStart"
         />
       </section>
     </div>
@@ -201,15 +213,19 @@
       </div>
       <div class="mt-3">
         <label for="paidCash" class="text-4xl flex gap-2 items-center">
-          <span class="grow">
+          <p class="block grow">
             實際支付金額:
-          </span>
+          </p>
           <input
             v-model="payCash"
             name="payCash"
             placeholder="已付金額"
             type="number"
-            class="p-3 w-[300px]"
+            min="0"
+            :max="orderTotal"
+            class="operateInput p-3 block w-[190px] text-right"
+            :class="{'active-operate': currentOperate === 'totalBonus'}"
+            @focus="setCurrentOperate('payCash')"
           />
         </label>
       </div>
@@ -217,12 +233,12 @@
         <p class="text-5xl flex">
           找零:
           <span class="grow text-end">
-            {{ numberThousand(payCash > 0 ? orderTotal - payCash : 0) }}
+            {{ numberThousand(payCash > 0 ? payCash - orderTotal : 0) }}
           </span>
         </p>
       </div>
     </div>
-    <div class="fixed bottom-0 flex gap-2 w-[45%] my-3">
+    <div class="fixed bottom-0 ml-3 flex gap-2 w-[45%] my-3">
       <p class="text-xl grow">
         <button type="button"
           class="
@@ -346,26 +362,36 @@ const recoverCurrentSearch = (): void => {
   }
 };
 const recoverCurrentChange = (): void => {
-  currentChange.value = new IShoppingItem();
-  currentKey.value = '';
   if (resetKeyboardVal.value) {
     resetKeyboardVal.value();
   }
+  currentChange.value = new IShoppingItem();
+  currentKey.value = '';
 };
+const currentOperate = ref<string>('');
 const handleClick = (event) => {
   if (event.target.classList.contains('van-key')) return;
   if (event.target.tagName.toLowerCase() === 'input') {
     if (event.target.classList.contains('searchInput')) {
       recoverCurrentChange();
+      currentOperate.value = '';
       return;
     }
     if (event.target.classList.contains('shoppingItem')) {
       recoverCurrentSearch();
+      currentOperate.value = '';
+      return;
+    }
+    if (event.target.classList.contains('operateInput')) {
+      console.log('8998', event.target.classList);
+      recoverCurrentSearch();
+      recoverCurrentChange();
       return;
     }
   }
   recoverCurrentSearch();
   recoverCurrentChange();
+  currentOperate.value = '';
 };
 /** 是否有權限修改價格 */
 const canModify = ref(false);
@@ -393,6 +419,9 @@ const setCurrentSearch = (item) => {
 const setCurrentChange = (item, key = ''): void => {
   currentChange.value = item as IShoppingItem;
   currentKey.value = key as string;
+};
+const setCurrentOperate = (key) : void => {
+  currentOperate.value = key;
 };
 const searchProductErrorMessage = ref<string>('請掃描條碼或輸入商品名稱');
 /**
@@ -501,18 +530,6 @@ const apiHandler = (content: SearchItem) => {
 // ^控制輸入
 /** 傳入計算機元件，透過面板更新輸入 */
 const shoppingList = reactive<IShoppingItem[]>([]);
-const inputFromPanel = (value: string) : void => {
-  if (currentKey.value) {
-    const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
-    if (idx < 0) return;
-    shoppingList[idx][currentKey.value] = value;
-    return;
-  }
-  if (currentSearch.value.key === searchKey.product) return;
-  if (currentSearch.value) {
-    currentSearch.value.value = value as string;
-  }
-};
 
 // ^訂單操作`
 /**
@@ -527,7 +544,7 @@ const addToCart = (product: IProductSpec) => {
     serial_number: product.serial_number,
     purchase_count: 1,
     price_per_unit: product.price_per_unit,
-    percentage_discount: 100,
+    percentage_discount: 0,
     amount_discount: 0,
   };
   const index = shoppingList.findIndex(
@@ -548,12 +565,15 @@ const removeFromCart = (id: number) => {
 };
 const usedEMoney = ref(0);
 const amountDiscount = ref(0);
-const percentageDiscount = ref(100);
+const percentageDiscount = ref(0);
 const usedBonus = ref(0);
 const payCash = ref(0);
-const shoppingItemTotal = computed(() => shoppingList.map((order) => Math.round(
-  order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
-) - order.amount_discount));
+const shoppingItemTotal = computed(() => shoppingList.map(
+  (order) => Math.round(
+  order.price_per_unit * order.purchase_count
+  * (order.percentage_discount || 100) as number / 100,
+  ) - order.amount_discount,
+));
 const totalBeforeDiscount = computed(
   () => shoppingItemTotal.value.reduce((acc, item) => acc + item, 0),
 );
@@ -590,7 +610,7 @@ const resetData = () => {
   shoppingList.splice(0);
   usedBonus.value = 0;
   usedEMoney.value = 0;
-  percentageDiscount.value = 100;
+  percentageDiscount.value = 0;
   amountDiscount.value = 0;
   payment.value = '';
   memberInfo.value = new Customer();
@@ -606,7 +626,7 @@ const createOrder = async () => {
     used_bonus: usedBonus.value,
     payment_method: payment.value,
     tax_number: taxNumber.value,
-    percentage_discount: percentageDiscount.value,
+    percentage_discount: percentageDiscount.value || 100,
     amount_discount: amountDiscount.value,
     auth_event_id: orderAuthorizedId.value,
     items: [...shoppingList],
@@ -631,6 +651,57 @@ const assignPayment = async (pay) => {
   payment.value = pay;
   await createOrder();
 };
+const inputFromPanel = (value: string) : void => {
+  if (currentKey.value) {
+    const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
+    if (idx < 0) return;
+    shoppingList[idx][currentKey.value] = value;
+    return;
+  }
+  if (currentOperate.value) {
+    switch (currentOperate.value) {
+      case 'totalPercentage':
+        percentageDiscount.value = parseInt(`${percentageDiscount.value}${value}`, 10);
+        break;
+      case 'totalDiscount':
+        amountDiscount.value = parseInt(`${amountDiscount.value}${value}`, 10);
+        break;
+      case 'totalEMoney':
+        usedEMoney.value = parseInt(`${usedEMoney.value}${value}`, 10);
+        break;
+      case 'totalBonus':
+        usedBonus.value = parseInt(`${usedBonus.value}${value}`, 10);
+        break;
+      case 'payCash':
+        payCash.value = parseInt(`${payCash.value}${value}`, 10);
+        break;
+      // no default
+    }
+    return;
+  }
+  if (currentSearch.value.key === searchKey.product) return;
+  if (currentSearch.value) {
+    currentSearch.value.value = value as string;
+  }
+};
+const keyboardStart = computed(() => {
+  if (currentOperate.value) {
+    switch (currentOperate.value) {
+      case 'totalPercentage':
+        return percentageDiscount.value;
+      case 'totalDiscount':
+        return amountDiscount.value;
+      case 'totalEMoney':
+        return usedEMoney.value;
+      case 'totalBonus':
+        return usedBonus.value;
+      case 'payCash':
+        return payCash.value;
+      // no default
+    }
+  }
+  return !currentKey.value ? currentSearch.value : currentChange.value[currentKey.value];
+});
 
 </script>
 <style lang="scss" scoped>
@@ -654,4 +725,13 @@ const assignPayment = async (pay) => {
       }
     }
   }
+  input {
+    &.operateInput {
+      @apply outline outline-1 outline-blue-500;
+    }
+    &.operateInput.active-operate {
+      @apply outline-pink-500;
+    }
+  }
+
 </style>

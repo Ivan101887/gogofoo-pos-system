@@ -6,6 +6,10 @@ import {
 import { IShoppingItem } from '../../../entities';
 
 const props = defineProps({
+  index: {
+    type: Number,
+    default: -1,
+  },
   searchKey: {
     type: String,
     default: '',
@@ -46,12 +50,12 @@ const order = reactive(props.item);
 const maxPrice = { ...order }.price_per_unit;
 // const baseTotal = {}
 const total = computed(() => Math.round(
-  order.price_per_unit * order.purchase_count * (order.percentage_discount / 100),
+  order.price_per_unit * order.purchase_count * ((order.percentage_discount || 100) / 100),
 ) - order.amount_discount);
 watch(order, (b, a) => {
   const discountBase = 100;
   const totalAfterDiscount = Math.round(
-    a.price_per_unit * a.purchase_count * (a.percentage_discount / 100),
+    a.price_per_unit * a.purchase_count * ((a.percentage_discount || 100) / 100),
   );
   switch (props.searchKey) {
     case editFieldName.price:
@@ -87,12 +91,12 @@ watch(order, (b, a) => {
           :name="editFieldName.price"
           v-model="order[editFieldName.price]"
           class="shoppingItem text-lg p-2"
-          :class="{ 'active-input': searchKey === editFieldName.price }"
+          :class="{ 'active-input': searchKey === `${index}-${editFieldName.price}` }"
           min="0"
           :max="maxPrice"
           :disabled="!canModify"
           inputmode="none"
-          @focus="focusOnEl(order, editFieldName.price)"
+          @focus="focusOnEl(order, `${index}-${editFieldName.price}`)"
           :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>
@@ -104,10 +108,10 @@ watch(order, (b, a) => {
           :name="editFieldName.count"
           v-model="order[editFieldName.count]"
           class="shoppingItem text-lg p-2"
-          :class="{ 'active-input': searchKey === editFieldName.count }"
+          :class="{ 'active-input': searchKey === `${index}-${editFieldName.count}` }"
           inputmode="none"
           min="1"
-          @focus="focusOnEl(order, editFieldName.count)"
+          @focus="focusOnEl(order, `${index}-${editFieldName.count}`)"
           :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>
@@ -119,12 +123,12 @@ watch(order, (b, a) => {
           :name="editFieldName.discount"
           v-model="order[editFieldName.discount]"
           class="shoppingItem text-lg p-2"
-          :class="{ 'active-input': searchKey === editFieldName.discount }"
+          :class="{ 'active-input': searchKey === `${index}-${editFieldName.discount}` }"
           max="100"
           min="0"
           step="5"
           inputmode="none"
-          @focus="focusOnEl(order, editFieldName.discount)"
+          @focus="focusOnEl(order, `${index}-${editFieldName.discount}`)"
           :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>
@@ -136,11 +140,11 @@ watch(order, (b, a) => {
           :name="editFieldName.coupon"
           v-model="order[editFieldName.coupon]"
           class="shoppingItem text-lg p-2"
-          :class="{ 'active-input': searchKey === editFieldName.coupon }"
+          :class="{ 'active-input': searchKey === `${index}-${editFieldName.coupon}` }"
           min="0"
           step="10"
           inputmode="none"
-          @focus="focusOnEl(order, editFieldName.coupon)"
+          @focus="focusOnEl(order, `${index}-${editFieldName.coupon}`)"
           :ref="(el) => {itemInputs.push(el as refElement)}"
         />
       </label>

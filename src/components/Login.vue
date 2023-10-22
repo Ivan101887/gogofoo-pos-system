@@ -23,7 +23,7 @@
             class="block login__input"
             placeholder="請輸入帳號以登入"
             v-model="loginInfo.username"
-            @keyup.enter.self="fnFocusNext"
+            @keyup.enter.self="fnFocusNext('pwd')"
           />
         </div>
         <div class="login__box">
@@ -35,8 +35,16 @@
             class="block login__input"
             placeholder="請輸入密碼以登入"
             v-model="loginInfo.password"
-            @keyup.enter="fnLogin"
           />
+        </div>
+        <div class="login__box">
+          <label for="storeSelect" class="block login__label">店別:</label>
+          <select name="storeSelect" class="block login__input" v-model="selectedStore">
+            <option value="" disabled>選擇所屬店別</option>
+            <option v-for="store in storeList" :key="store.value">
+              {{ store.text }}
+            </option>
+          </select>
         </div>
       </div>
       <div class="login__foot">
@@ -55,7 +63,7 @@
 
 <script setup lang="ts">
 import {
-  reactive, ref, defineProps, defineEmits,
+  reactive, ref, defineProps, defineEmits, computed,
 } from 'vue';
 import { loginInfo as typeLoginInfo } from '../../entities';
 
@@ -70,13 +78,23 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['login']);
-const pwd = ref();
+const pwd = ref<HTMLInputElement | null>(null);
+// 林口店、中山店、民族東路店、台中店
+const storeList = reactive<{text: string, value: string}[]>([
+  { text: '林口店', value: 'LK' },
+  { text: '中山店', value: 'ZS' },
+  { text: '民族東路店', value: 'MZE' },
+  { text: '台中店', value: 'TC' },
+]);
+const selectedStore = ref<string>('');
 const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
 const fnLogin = ():void => {
   emit('login', loginInfo);
 };
-function fnFocusNext() : void {
-  pwd.value.focus();
+function fnFocusNext(key: string) : void {
+  if (key === 'pwd') {
+    pwd.value?.focus();
+  }
 }
 
 </script>
@@ -91,7 +109,7 @@ function fnFocusNext() : void {
   @apply flex justify-center items-center bg-black/[0.6];
 }
 .login {
-  @apply w-[400px] h-[300px] bg-light p-[20px] rounded-lg;
+  @apply w-[400px] bg-light p-[20px] rounded-lg;
   @apply flex flex-col justify-center items-center gap-[20px];
   &__iconWrapper {
     @apply relative;

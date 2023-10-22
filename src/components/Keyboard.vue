@@ -36,11 +36,10 @@ const props = defineProps({
   },
 });
 const value = ref(props.val);
-const enter = (e) : void => {
+const enter = () : void => {
   const { fnEnter } = props;
   if (!fnEnter) return;
   fnEnter();
-  console.log(e, 111);
 };
 const onInput = (v) : void => {
   value.value = props.val;
@@ -51,6 +50,7 @@ const onInput = (v) : void => {
   value.value = `${v}`;
 };
 const onDelete = () : void => {
+  value.value = props.val;
   value.value = value.value.slice(0, -1);
 };
 const resetValue = () : void => {
@@ -60,6 +60,7 @@ onMounted(() => {
   props.fnGetReset(resetValue);
 });
 watch(value, () => {
+  console.log(value.value);
   props.updateValue(value.value);
 });
 </script>

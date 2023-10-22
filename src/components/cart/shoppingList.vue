@@ -40,14 +40,12 @@ const numberThousand = (number: number): string => {
           <th class="p-2.5 text-lg font-semibold" width="12%">打折</th>
           <th class="p-2.5 text-lg font-semibold" width="15%">折扣金額</th>
           <th class="p-2.5 text-lg font-semibold" width="15%">小結</th>
-          <th class="p-2.5 text-lg font-semibold" width="6%">
-
-          </th>
+          <th class="p-2.5 text-lg font-semibold" width="6%"></th>
         </tr>
       </thead>
       <tbody>
-        <template v-for="item in shoppingList" :key="item.id">
-          <ShoppingItem :item="item" v-bind="$attrs" @removeItem="removeItem" />
+        <template v-for="item, index in shoppingList" :key="item.id">
+          <ShoppingItem :item="item" v-bind="$attrs" :index="index" @removeItem="removeItem" />
         </template>
       </tbody>
     </table>
