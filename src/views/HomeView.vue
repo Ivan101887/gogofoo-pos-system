@@ -655,7 +655,9 @@ const inputFromPanel = (value: string) : void => {
   if (currentKey.value) {
     const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
     if (idx < 0) return;
-    shoppingList[idx][currentKey.value] = value;
+    const key = currentKey.value.split('-')[1];
+    shoppingList[idx][key] = value;
+    console.log(shoppingList[idx][key]);
     return;
   }
   if (currentOperate.value) {
@@ -699,8 +701,10 @@ const keyboardStart = computed(() => {
         return payCash.value;
       // no default
     }
+    return '';
   }
-  return !currentKey.value ? currentSearch.value : currentChange.value[currentKey.value];
+  const key = currentKey.value.split('-')[1];
+  return !currentKey.value ? currentSearch.value : currentChange.value[key];
 });
 
 </script>

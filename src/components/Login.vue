@@ -63,11 +63,11 @@
 
 <script setup lang="ts">
 import {
-  reactive, ref, defineProps, defineEmits, computed,
+  reactive, ref, defineProps, defineEmits,
 } from 'vue';
 import { loginInfo as typeLoginInfo } from '../../entities';
 
-const props = defineProps({
+defineProps({
   isError: {
     type: Boolean,
     default: false,

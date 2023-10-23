@@ -2,7 +2,7 @@
 import { defineProps, PropType, defineEmits } from 'vue';
 import { IShoppingItem } from '../../../entities';
 
-const props = defineProps({
+defineProps({
   shoppingList: {
     type: Array as PropType<IShoppingItem[]>,
     default: () => [],

@@ -15,8 +15,8 @@ import router from './router/index';
 import store from './store';
 import '@vant/touch-emulator';
 import 'vant/lib/index.css';
-import '@/assets/scss/helper/button.scss';
 import '@/assets/scss/all.scss';
+import '@/assets/scss/helper/button.scss';
 
 library.add(faMagnifyingGlass, faUser, faTrashCan, faExclamation);
 createApp(App)

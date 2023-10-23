@@ -21,7 +21,7 @@ const emit = defineEmits(['addToCart']);
 const addToCart = (product: IProductSpec) => {
   emit('addToCart', product);
 };
-const props = defineProps({
+defineProps({
   /** @params {String} errorMessage - 錯誤訊息 */
   errorMessage: {
     type: String,
