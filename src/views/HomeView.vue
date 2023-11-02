@@ -3,7 +3,6 @@
   <div
     class="main flex flex-auto w-full h-[calc(100vh-44px)]"
     @click="handleClick"
-    @keyup.Tab="showMsg"
   >
     <!-- 主畫面左半邊 -->
     <section class="main__head cashier flex flex-col w-3/5 bg-sky-200">
@@ -11,14 +10,14 @@
         <SearchInput
           :searchItem="searchItemProduct"
           :error-message="searchProductErrorMessage"
-          :is-show-loading="currentSearch.isShowLoading"
-          :is-search-error="currentSearch.isSearchError"
+          :is-show-loading="searchItemProduct.isShowLoading"
+          :is-search-error="searchItemProduct.isSearchError"
           placeholder="輸入產品編號或名稱"
           :result="productList"
-          :fn-set-current="setCurrentSearch"
           :fn-search="apiHandler"
           :can-modify="canModify"
           @add-to-cart="addToCart"
+          @focus="resetLoading"
         >
         </SearchInput>
       </div>
@@ -29,11 +28,10 @@
       >
         <ShoppingList
           :shopping-list="shoppingList"
-          :focus-on-el="setCurrentChange"
-          :search-key="currentKey"
           :canModify="canModify"
           :total="totalBeforeDiscount"
           @removeItem="removeFromCart"
+          @focus="resetLoading"
         >
         <template #modify>
           <button type="button" class="btn px-3" @click="checkAuthorization">
@@ -161,7 +159,8 @@
           <SearchInput
             :searchItem="searchItemUser"
             placeholder="客戶編號"
-            :fn-set-current="setCurrentSearch"
+            :fn-search="apiHandler"
+            @focus="resetLoading"
           >
             <template #prefix>
               <font-awesome-icon
@@ -187,17 +186,13 @@
         <OrderCustomer
           :customer="memberInfo"
           :is-show-result="searchItemUser.isShowResult"
-          :is-show-loading="currentSearch.isShowLoading"
-          :is-search-error="currentSearch.isSearchError"
+          :is-show-loading="searchItemUser.isShowLoading"
+          :is-search-error="searchItemUser.isSearchError"
           :error-message="searchUserErrorMessage"
         />
       </section>
       <section class="container__foot h-3/5">
-        <Keyboard
-          :update-value="inputFromPanel"
-          :fn-get-reset="setResetFunction"
-          :val="keyboardStart"
-        />
+        <Keyboard />
       </section>
     </div>
   </div>
@@ -292,6 +287,7 @@ import {
   getAuthorization,
   createNewOrder,
 } from '@/userRequest';
+import { useStore } from 'vuex';
 import {
   IProductSpec, IShoppingItem, Customer, permission,
 } from '../../entities';
@@ -337,16 +333,9 @@ const props = defineProps({
     default: () => [],
   },
 });
-const showMsg = () : void => {
-  console.log('tab');
-};
 const emit = defineEmits(['updatePermissionList']);
 /** 會員搜尋 */
 const isShowModal = ref(false);
-const resetKeyboardVal = ref<null |(() => void)>(null);
-const setResetFunction = (func: (() => void)) : void => {
-  resetKeyboardVal.value = func;
-};
 const numberThousand = (number: number): string => {
   if (number === undefined || Number.isNaN(number)) {
     return '-';
@@ -356,112 +345,65 @@ const numberThousand = (number: number): string => {
 };
 const searchItemProduct = ref<SearchItem>(new SearchItem(searchKey.product));
 const searchItemUser = ref<SearchItem>(new SearchItem(searchKey.user));
-const currentChange = ref<IShoppingItem>(new IShoppingItem());
-const currentSearch = ref<SearchItem>(new SearchItem());
-const currentKey = ref<string>('');
-const recoverCurrentSearch = (): void => {
-  currentSearch.value.value = '';
-  currentSearch.value.isShowResult = false;
-  currentSearch.value.isShowLoading = false;
-  currentSearch.value.isSearchError = false;
-  if (resetKeyboardVal.value) {
-    resetKeyboardVal.value();
-  }
-};
-const recoverCurrentChange = (): void => {
-  if (resetKeyboardVal.value) {
-    resetKeyboardVal.value();
-  }
-  currentChange.value = new IShoppingItem();
-  currentKey.value = '';
+const resetLoading = (): void => {
+  searchItemProduct.value.value = '';
+  searchItemProduct.value.isShowLoading = false;
+  searchItemProduct.value.isShowResult = false;
+  searchItemProduct.value.isSearchError = false;
+  searchItemUser.value.value = '';
+  searchItemUser.value.isSearchError = false;
+  searchItemUser.value.isShowLoading = false;
+  searchItemUser.value.isShowResult = false;
 };
 const currentOperate = ref<string>('');
+const store = useStore();
 const handleClick = (event) => {
-  if (event.target.classList.contains('van-key')) return;
-  if (event.target.tagName.toLowerCase() === 'input') {
-    if (event.target.classList.contains('searchInput')) {
-      recoverCurrentChange();
-      currentOperate.value = '';
-      return;
-    }
-    if (event.target.classList.contains('shoppingItem')) {
-      recoverCurrentSearch();
-      currentOperate.value = '';
-      return;
-    }
-    if (event.target.classList.contains('operateInput')) {
-      console.log('8998', event.target.classList);
-      recoverCurrentSearch();
-      recoverCurrentChange();
-      return;
-    }
-  }
-  recoverCurrentSearch();
-  recoverCurrentChange();
-  currentOperate.value = '';
+  if (event.target.tagName.toLowerCase() === 'input') return;
+  store.dispatch('assign_el', null);
+  resetLoading();
 };
 /** 是否有權限修改價格 */
 const canModify = ref(false);
 /** 訂單的會員資訊 */
 const memberInfo = ref<Customer>(new Customer());
-// ^元素操作
-// ^搜尋功能
+
 /** @param {IProduct[]} productList 商品的搜尋結果 */
 const productList = reactive<IProductSpec[]>([]);
-const setCurrentSearch = (item) => {
-  if (currentSearch.value.key !== item.key) {
-    switch (item.key) {
-      case searchKey.product:
-        productList.splice(0, productList.length);
-        break;
-        // no default
-      default:
-        break;
-    }
-    recoverCurrentSearch();
-  }
-  currentSearch.value = item as SearchItem;
-  currentSearch.value.value = item.value;
-};
-const setCurrentChange = (item, key = ''): void => {
-  currentChange.value = item as IShoppingItem;
-  currentKey.value = key as string;
-};
 const setCurrentOperate = (key) : void => {
   currentOperate.value = key;
 };
 const searchProductErrorMessage = ref<string>('請掃描條碼或輸入商品名稱');
 /**
-     * 產品搜索
-     * @param keyword 搜索商品關鍵字
-     * @returns {void}
-     */
+ * 產品搜索
+ * @param keyword 搜索商品關鍵字
+ * @returns {void}
+ */
 const getProductList = (keyword: string) => {
   // 搜尋前先清空陣列，以保證最終搜尋結果的正確性
   productList.splice(0, productList.length);
   // 如果沒有值就不搜尋了
   if (!keyword) {
-    currentSearch.value.isShowLoading = false;
+    searchItemProduct.value.isShowLoading = false;
     return;
   }
   /**
-       * 判斷是否為流水編號
-       *  -如果是流水編號就直接拿指定的商品
-       *  -反之就當成關鍵字搜尋相關商品
-       */
+   * 判斷是否為流水編號
+   *  -如果是流水編號就直接拿指定的商品
+   *  -反之就當成關鍵字搜尋相關商品
+   */
   if (productSerialRegex.test(keyword.trim())) {
     getSpecWithSerialNumber(keyword.trim())
       .then((spec) => {
         if (!spec.data.length) {
           searchProductErrorMessage.value = '找不到相關的商品';
-          currentSearch.value.isSearchError = true;
+          searchItemProduct.value.isSearchError = true;
         }
         productList.push(spec.data);
       })
       .catch((err) => {
         console.log(err);
         searchProductErrorMessage.value = '找不到相關的商品';
-        currentSearch.value.isSearchError = true;
+        searchItemProduct.value.isSearchError = true;
       });
   } else {
     getSpecListWithName({
@@ -472,7 +414,7 @@ const getProductList = (keyword: string) => {
       .then((res) => {
         if (!res.data.length) {
           searchProductErrorMessage.value = '找不到相關的商品';
-          currentSearch.value.isSearchError = false;
+          searchItemProduct.value.isSearchError = false;
           return;
         }
         productList.push(...res.data);
@@ -480,15 +422,14 @@ const getProductList = (keyword: string) => {
       .catch((err) => {
         console.log(err);
         searchProductErrorMessage.value = '找不到相關的商品';
-        currentSearch.value.isSearchError = true;
+        searchItemProduct.value.isSearchError = true;
       });
   }
-  currentSearch.value.isShowLoading = false;
+  searchItemProduct.value.isShowLoading = false;
 };
 const searchUserErrorMessage = ref<string>(noticeText);
 const setOrderMember = (member: Customer) => {
   memberInfo.value = member;
-  recoverCurrentSearch();
   searchUserErrorMessage.value = noticeText;
 };
 const getCustomerData = (keyword) => {
@@ -496,19 +437,18 @@ const getCustomerData = (keyword) => {
     getMember({ phone: keyword })
       .then((res) => {
         searchUserErrorMessage.value = '';
-        currentSearch.value.isSearchError = false;
-        currentSearch.value.isShowLoading = false;
+        searchItemUser.value.isSearchError = false;
+        searchItemUser.value.isShowLoading = false;
         setOrderMember(res.data);
       })
       .catch((err) => {
         searchUserErrorMessage.value = err.response.data;
-        currentSearch.value.isShowLoading = false;
-        currentSearch.value.isSearchError = true;
+        searchItemUser.value.isShowLoading = false;
+        searchItemUser.value.isSearchError = true;
       });
   }
 };
 
-// ^控制api
 /** @param {number | null} 輸入事件的debounce定時器 */
 const timeout = ref<null | number>(null);
 /** 控制搜尋的api以及各項狀態的更新 */
@@ -517,8 +457,8 @@ const apiHandler = (content: SearchItem) => {
     if (content.key === searchKey.product) {
       searchProductErrorMessage.value = '請掃描條碼或輸入商品名稱';
     } else {
-      currentSearch.value.isShowResult = true;
-      currentSearch.value.isShowLoading = true;
+      searchItemUser.value.isShowResult = true;
+      searchItemUser.value.isShowLoading = true;
       searchUserErrorMessage.value = noticeText;
     }
   }
@@ -562,7 +502,6 @@ const addToCart = (product: IProductSpec) => {
   } else {
     shoppingList[index].purchase_count += 1;
   }
-  recoverCurrentSearch();
 };
 const removeFromCart = (id: number) => {
   const index = shoppingList.findIndex((item) => item.id === id);
@@ -658,61 +597,6 @@ const assignPayment = async (pay) => {
   payment.value = pay;
   await createOrder();
 };
-const inputFromPanel = (value: string) : void => {
-  if (currentKey.value) {
-    const idx = shoppingList.findIndex((item) => item.id === currentChange.value.id);
-    if (idx < 0) return;
-    const key = currentKey.value.split('-')[1];
-    shoppingList[idx][key] = value;
-    console.log(shoppingList[idx][key]);
-    return;
-  }
-  if (currentOperate.value) {
-    switch (currentOperate.value) {
-      case 'totalPercentage':
-        percentageDiscount.value = parseInt(`${percentageDiscount.value}${value}`, 10);
-        break;
-      case 'totalDiscount':
-        amountDiscount.value = parseInt(`${amountDiscount.value}${value}`, 10);
-        break;
-      case 'totalEMoney':
-        usedEMoney.value = parseInt(`${usedEMoney.value}${value}`, 10);
-        break;
-      case 'totalBonus':
-        usedBonus.value = parseInt(`${usedBonus.value}${value}`, 10);
-        break;
-      case 'payCash':
-        payCash.value = parseInt(`${payCash.value}${value}`, 10);
-        break;
-      // no default
-    }
-    return;
-  }
-  if (currentSearch.value.key === searchKey.product) return;
-  if (currentSearch.value) {
-    currentSearch.value.value = value as string;
-  }
-};
-const keyboardStart = computed(() => {
-  if (currentOperate.value) {
-    switch (currentOperate.value) {
-      case 'totalPercentage':
-        return percentageDiscount.value;
-      case 'totalDiscount':
-        return amountDiscount.value;
-      case 'totalEMoney':
-        return usedEMoney.value;
-      case 'totalBonus':
-        return usedBonus.value;
-      case 'payCash':
-        return payCash.value;
-      // no default
-    }
-    return '';
-  }
-  const key = currentKey.value.split('-')[1];
-  return !currentKey.value ? currentSearch.value : currentChange.value[key];
-});
 
 </script>
 <style lang="scss" scoped>

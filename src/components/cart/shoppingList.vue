@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { defineProps, PropType, defineEmits } from 'vue';
+import {
+  defineProps, PropType, defineEmits, ref,
+} from 'vue';
 import { IShoppingItem } from '../../../entities';
 
 defineProps({
@@ -23,6 +25,10 @@ const numberThousand = (number: number): string => {
   const regExpInfo = /(\d{1,3})(?=(\d{3})+(?:$|\.))/g;
   return `${number.toString().replace(regExpInfo, '$1,')}`;
 };
+const now = ref<number>(0);
+const setNow = (index: number) : void => {
+  now.value = index;
+};
 
 </script>
 <template>
@@ -45,7 +51,14 @@ const numberThousand = (number: number): string => {
       </thead>
       <tbody>
         <template v-for="item, index in shoppingList" :key="item.id">
-          <ShoppingItem :item="item" v-bind="$attrs" :index="index" @removeItem="removeItem" />
+          <ShoppingItem
+            v-bind="$attrs"
+            :item="item"
+            :now="now"
+            :index="index"
+            @nextLine="setNow"
+            @removeItem="removeItem"
+          />
         </template>
       </tbody>
     </table>

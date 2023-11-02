@@ -20,10 +20,11 @@
       v-model="item.value"
       :placeholder="placeholder"
       :inputmode="item.key === searchKey.user ? 'none' : 'text'"
-      @input="show"
-      @focus="test"
+      @input="input"
+
+      @keyup.enter="searchOnEnter"
+      @focus="assignEl"
     />
-      <!-- @focus="fnSetCurrent(item)" -->
   </label>
   <!-- 商品檢索結果 -->
   <div
@@ -36,12 +37,11 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
-  defineComponent, PropType, reactive, watchEffect,
+  PropType, reactive, watchEffect, defineProps, defineEmits,
 } from 'vue';
 import { useStore } from 'vuex';
-
 import SearchList from './searchList.vue';
 
 class Item {
@@ -69,76 +69,70 @@ class Item {
     this.isShowLoading = isShowLoading;
   }
 }
-export default defineComponent({
-  components: { SearchList },
-  props: {
-    /** @param {Object} searchItem - 搜尋框的物件  */
-    searchItem: {
-      type: Object as PropType<Item>,
-      default: new Item(),
-    },
-    /** @param {string} placeholder - 輸入框的替代文字 */
-    placeholder: {
-      type: String,
-      default: '',
-    },
-    /** @params {Function} fnSetCurrent - 獲取目前輸入的元素 */
-    fnSetCurrent: {
-      type: Function,
-      default: null,
-    },
-    /** @param {Function} fnSearch - 搜尋關鍵字 */
-    fnSearch: {
-      type: Function,
-      default: null,
-    },
+
+const props = defineProps({
+  /** @param {Object} searchItem - 搜尋框的物件  */
+  searchItem: {
+    type: Object as PropType<Item>,
+    require: true,
   },
-  setup(props) {
-    // eslint-disable-next-line no-shadow
-    enum searchKey {
-      product = 'product',
-      user = 'user',
-    }
-    const item = reactive(props.searchItem);
-    const show = (e) => {
-      console.log(e);
-      if (e.isTrusted) return;
-      if (e.inputType === 'deleteContentBackward') {
-        item.value = item.value.slice(0, -1);
-        return;
-      }
-      if (item.value) {
-        item.value += e.data;
-        return;
-      }
-      item.value = e.data;
-    };
-    watchEffect(async () => {
-      if (item.key === searchKey.user) return;
-      if (!item.value) {
-        item.isShowLoading = false;
-        item.isShowResult = false;
-        item.isSearchError = false;
-        return;
-      }
-      item.isShowResult = true;
-      item.isShowLoading = true;
-      await props.fnSearch(item);
-    });
-    const store = useStore();
-    const test = (e) => {
-      console.log(e);
-      store.dispatch('assign_el', e.target);
-    };
-    return {
-      item,
-      test,
-      store,
-      searchKey,
-      show,
-    };
+  /** @param {string} placeholder - 輸入框的替代文字 */
+  placeholder: {
+    type: String,
+    default: '',
+  },
+  /** @param {Function} fnSearch - 搜尋關鍵字 */
+  fnSearch: {
+    type: Function,
+    default: null,
   },
 });
+// eslint-disable-next-line no-shadow
+enum searchKey {
+  product = 'product',
+  user = 'user',
+}
+const item = reactive<Item>(props.searchItem as Item);
+const input = (e) => {
+  if (e.isTrusted) return;
+  if (e.inputType === 'deleteContentBackward') {
+    item.value = item.value.slice(0, -1);
+    return;
+  }
+  if (item.value) {
+    item.value += e.data;
+    return;
+  }
+  item.value = e.data;
+};
+const emit = defineEmits(['focus']);
+const store = useStore();
+const assignEl = (e) => {
+  const target = store.getters.getCurrentElement;
+  emit('focus', item.key);
+  if (target && target === e.target) return;
+  store.dispatch('assign_el', e.target);
+};
+const search = async () => {
+  if (!item.value) {
+    item.isShowLoading = false;
+    item.isShowResult = false;
+    item.isSearchError = false;
+    return;
+  }
+  item.isShowResult = true;
+  item.isShowLoading = true;
+  await props.fnSearch(item);
+};
+const searchOnEnter = async () => {
+  if (item.key === searchKey.product) return;
+  await search();
+};
+watchEffect(async () => {
+  if (item.key === searchKey.user) return;
+  await search();
+});
+
 </script>
 
 <style lang="scss" scoped>
