@@ -6,7 +6,7 @@
       show
       @input="onInput"
       @delete="onDelete"
-      @close="enter"
+      @close="simulateKeyUpTab"
     >
     </van-number-keyboard>
   </div>
@@ -16,6 +16,7 @@
 import {
   ref, defineProps, watch, onMounted,
 } from 'vue';
+import { useStore } from 'vuex';
 
 const props = defineProps({
   val: {
@@ -30,28 +31,40 @@ const props = defineProps({
     type: Function,
     default: null,
   },
-  fnEnter: {
-    type: Function,
-    default: null,
-  },
 });
 const value = ref(props.val);
-const enter = () : void => {
-  const { fnEnter } = props;
-  if (!fnEnter) return;
-  fnEnter();
-};
+const store = useStore();
 const onInput = (v) : void => {
-  value.value = props.val;
-  if (value.value) {
-    value.value += `${v}`;
-    return;
-  }
-  value.value = `${v}`;
+  const el = store.getters.getCurrentElement;
+  const event = new InputEvent('input', {
+    bubbles: true, // Whether the event should bubble up through the DOM
+    cancelable: true, // Whether the event can be canceled
+    data: `${v}`, // The input data associated with the event
+    inputType: 'insertText', // The type of input event (e.g., 'insertText', 'insertCompositionText', 'deleteContentBackward', etc.)
+    isComposing: false, // Indicates whether the event is part of a composition (IME) session
+    composed: true,
+  });
+  el.dispatchEvent(event);
+  // value.value = props.val;
+  // if (value.value) {
+  //   value.value += `${v}`;
+  //   return;
+  // }
+  // value.value = `${v}`;
 };
 const onDelete = () : void => {
-  value.value = props.val;
-  value.value = value.value.slice(0, -1);
+  const el = store.getters.getCurrentElement;
+  const event = new InputEvent('input', {
+    bubbles: true, // Whether the event should bubble up through the DOM
+    cancelable: true, // Whether the event can be canceled
+    data: null, // The input data associated with the event
+    inputType: 'deleteContentBackward', // The type of input event (e.g., 'insertText', 'insertCompositionText', 'deleteContentBackward', etc.)
+    isComposing: false, // Indicates whether the event is part of a composition (IME) session
+    composed: true,
+  });
+  el.dispatchEvent(event);
+  // value.value = props.val;
+  // value.value = value.value.slice(0, -1);
 };
 const resetValue = () : void => {
   value.value = '';
@@ -63,6 +76,22 @@ watch(value, () => {
   console.log(value.value);
   props.updateValue(value.value);
 });
+const simulateKeyUpTab = (): void => {
+  console.log('simulating keyup event');
+  const event = new KeyboardEvent('keyup', {
+    key: 'Tab',
+    code: 'Tab',
+    keyCode: 9,
+    which: 9,
+    shiftKey: false,
+    altKey: false,
+    ctrlKey: false,
+    metaKey: false,
+  });
+  const target = document.activeElement as HTMLInputElement;
+  console.log(target);
+  target.dispatchEvent(event);
+};
 </script>
 <style lang="scss" scoped>
 .keyboard {

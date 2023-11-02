@@ -1,6 +1,10 @@
 <template>
   <!-- 主畫面 -->
-  <div class="main flex flex-auto w-full h-[calc(100vh-44px)]" @click="handleClick">
+  <div
+    class="main flex flex-auto w-full h-[calc(100vh-44px)]"
+    @click="handleClick"
+    @keyup.Tab="showMsg"
+  >
     <!-- 主畫面左半邊 -->
     <section class="main__head cashier flex flex-col w-3/5 bg-sky-200">
       <div class="cashier__head relative my-2.5 mx-5">
@@ -333,6 +337,9 @@ const props = defineProps({
     default: () => [],
   },
 });
+const showMsg = () : void => {
+  console.log('tab');
+};
 const emit = defineEmits(['updatePermissionList']);
 /** 會員搜尋 */
 const isShowModal = ref(false);

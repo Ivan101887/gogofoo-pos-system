@@ -20,8 +20,10 @@
       v-model="item.value"
       :placeholder="placeholder"
       :inputmode="item.key === searchKey.user ? 'none' : 'text'"
-      @focus="fnSetCurrent(item)"
+      @input="show"
+      @focus="test"
     />
+      <!-- @focus="fnSetCurrent(item)" -->
   </label>
   <!-- 商品檢索結果 -->
   <div
@@ -38,6 +40,8 @@
 import {
   defineComponent, PropType, reactive, watchEffect,
 } from 'vue';
+import { useStore } from 'vuex';
+
 import SearchList from './searchList.vue';
 
 class Item {
@@ -96,6 +100,19 @@ export default defineComponent({
       user = 'user',
     }
     const item = reactive(props.searchItem);
+    const show = (e) => {
+      console.log(e);
+      if (e.isTrusted) return;
+      if (e.inputType === 'deleteContentBackward') {
+        item.value = item.value.slice(0, -1);
+        return;
+      }
+      if (item.value) {
+        item.value += e.data;
+        return;
+      }
+      item.value = e.data;
+    };
     watchEffect(async () => {
       if (item.key === searchKey.user) return;
       if (!item.value) {
@@ -108,9 +125,17 @@ export default defineComponent({
       item.isShowLoading = true;
       await props.fnSearch(item);
     });
+    const store = useStore();
+    const test = (e) => {
+      console.log(e);
+      store.dispatch('assign_el', e.target);
+    };
     return {
       item,
+      test,
+      store,
       searchKey,
+      show,
     };
   },
 });
