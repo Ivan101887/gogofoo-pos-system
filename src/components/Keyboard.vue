@@ -8,7 +8,7 @@
       close-button-text="Enter"
       @input="onInput"
       @delete="onDelete"
-      @close="simulateKeyUpTab"
+      @close="simulateKeyUpEnter"
       @click.stop
     >
     </van-number-keyboard>
@@ -47,7 +47,7 @@ const onDelete = () : void => {
     el.value.dispatchEvent(event);
   }
 };
-const simulateKeyUpTab = (): void => {
+const simulateKeyUpEnter = (): void => {
   const event = new KeyboardEvent('keyup', {
     key: 'Enter',
     code: 'Enter',
@@ -60,6 +60,7 @@ const simulateKeyUpTab = (): void => {
   });
   if (el.value) {
     el.value.dispatchEvent(event);
+    store.dispatch('assign_el', null);
   }
 };
 </script>

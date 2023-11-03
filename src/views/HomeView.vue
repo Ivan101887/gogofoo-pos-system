@@ -473,14 +473,17 @@ const getCustomerData = (keyword) => {
     getMember({ phone: keyword })
       .then((res) => {
         searchUserErrorMessage.value = '';
+        searchItemUser.value.value = '';
         searchItemUser.value.isSearchError = false;
         searchItemUser.value.isShowLoading = false;
+        searchItemUser.value.isShowResult = false;
         setOrderMember(res.data);
       })
       .catch((err) => {
         searchUserErrorMessage.value = err.response.data;
         searchItemUser.value.isShowLoading = false;
         searchItemUser.value.isSearchError = true;
+        searchItemUser.value.isShowResult = true;
       });
   }
 };

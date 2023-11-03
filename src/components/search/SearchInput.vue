@@ -21,7 +21,6 @@
       :placeholder="placeholder"
       :inputmode="item.key === searchKey.user ? 'none' : 'text'"
       @input="input"
-
       @keyup.enter="searchOnEnter"
       @focus="assignEl"
     />
