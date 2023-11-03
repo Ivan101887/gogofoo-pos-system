@@ -3,7 +3,9 @@
     <van-number-keyboard
       theme="custom"
       :extra-key="['00', '.']"
+      :style="{ color: '#000' }"
       show
+      close-button-text="Enter"
       @input="onInput"
       @delete="onDelete"
       @close="simulateKeyUpTab"
@@ -86,7 +88,7 @@ const simulateKeyUpTab = (): void => {
     @apply gap-5;
   }
   &:deep(.van-key) {
-    @apply bg-gray-100 shadow shadow-gray-600 h-full;
+    @apply bg-gray-100 shadow shadow-gray-600 h-full text-black;
   }
   &:deep(.van-key--large) {
     @apply box-border py-6 static;
