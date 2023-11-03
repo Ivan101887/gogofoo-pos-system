@@ -51,16 +51,19 @@
           </p>
           <input
             type="number"
-            v-model.number="percentageDiscount"
+            v-model.number="orderVal.totalPercentage"
             max="100"
             min="0"
             step="10"
+            ref="totalPercentage"
             class="operateInput
             block grow  p-2 rounded text-right"
-            :class="{'active-operate': currentOperate === 'totalPercentage'}"
+            :class="{'active-operate': el === totalPercentage}"
             name="totalPercentage"
             inputmode="none"
-            @focus="setCurrentOperate('totalPercentage')"
+            @input="input($event as InputEvent)"
+            @keyup.enter="() => totalDiscount?.focus()"
+            @focus="assignEl"
           />
         </label>
         <label for="totalDiscount" class="flex gap-5 items-center basis-2/5 text-xl">
@@ -69,16 +72,19 @@
           </p>
           <input
             type="number"
-            v-model.number="amountDiscount"
+            v-model.number="orderVal.totalDiscount"
             max="100"
             min="0"
             step="10"
+            ref="totalDiscount"
             class="operateInput
             block grow  p-2 rounded text-right"
-            :class="{'active-operate': currentOperate === 'totalDiscount'}"
+            :class="{'active-operate': el === totalDiscount}"
             name="totalDiscount"
             inputmode="none"
-            @focus="setCurrentOperate('totalDiscount')"
+            @input="input($event as InputEvent)"
+            @keyup.enter="() => totalEMoney?.focus()"
+            @focus="assignEl"
           />
         </label>
         <label for="totalEMoney" class="flex gap-5 items-center basis-2/5 text-xl">
@@ -87,16 +93,19 @@
           </p>
           <input
             type="number"
-            v-model="usedEMoney"
+            v-model="orderVal.totalEMoney"
             max="100"
             min="0"
             step="10"
+            ref="totalEMoney"
             class="operateInput
             block grow  p-2 rounded text-right"
-            :class="{'active-operate': currentOperate === 'totalEMoney'}"
+            :class="{'active-operate': el === totalEMoney}"
             name="totalEMoney"
             inputmode="none"
-            @focus="setCurrentOperate('totalEMoney')"
+            @input="input($event as InputEvent)"
+            @keyup.enter="() => totalBonus?.focus()"
+            @focus="assignEl"
           />
         </label>
         <label for="totalBonus" class="flex gap-5 items-center basis-2/5 text-xl">
@@ -106,16 +115,18 @@
           <input
             type="number"
             :disabled="!canUseBonus"
-            v-model="usedBonus"
+            v-model="orderVal.totalBonus"
             max="100"
             min="0"
             step="10"
+            ref="totalBonus"
             class="operateInput
             block grow  p-2 rounded text-right"
-            :class="{'active-operate': currentOperate === 'totalBonus'}"
+            :class="{'active-operate': el === totalBonus}"
             name="totalBonus"
             inputmode="none"
-            @focus="setCurrentOperate('totalBonus')"
+            @keyup.enter="isShowModal = true"
+            @focus="assignEl"
           />
         </label>
         <div class="flex gap-5 items-center grow text-2xl">
@@ -216,15 +227,38 @@
             實際支付金額:
           </p>
           <input
-            v-model="payCash"
-            name="payCash"
+            v-model="orderVal.paidCash"
+            name="paidCash"
             placeholder="已付金額"
             type="number"
             min="0"
             :max="orderTotal"
+            ref="paidCash"
             class="operateInput p-3 block w-[190px] text-right"
-            :class="{'active-operate': currentOperate === 'totalBonus'}"
-            @focus="setCurrentOperate('payCash')"
+            :class="{'active-operate': el === paidCash}"
+            @input="input($event as InputEvent)"
+            @keyup.enter="() => taxNum?.focus()"
+            @focus="assignEl"
+          />
+        </label>
+      </div>
+      <div class="mt-3">
+        <label for="taxNum" class="text-4xl flex gap-2 items-center">
+          <p class="block grow">
+            統一編號:
+          </p>
+          <input
+            v-model="orderVal.taxNum"
+            name="taxNum"
+            placeholder="輸入統編"
+            type="text"
+            ref="taxNum"
+            :maxlength="8"
+            class="operateInput p-3 block w-[190px] text-right"
+            :class="{'active-operate': el === taxNum}"
+            @input="input($event as InputEvent)"
+            @keyup.enter="store.dispatch('assign_el', null)"
+            @focus="assignEl"
           />
         </label>
       </div>
@@ -232,7 +266,7 @@
         <p class="text-5xl flex">
           找零:
           <span class="grow text-end">
-            {{ numberThousand(payCash > 0 ? payCash - orderTotal : 0) }}
+            {{ numberThousand(orderVal.paidCash > 0 ? orderTotal - orderVal.paidCash : 0) }}
           </span>
         </p>
       </div>
@@ -278,7 +312,7 @@
 
 <script setup lang="ts">
 import {
-  defineProps, defineEmits, ref, reactive, computed, PropType,
+  defineProps, defineEmits, ref, reactive, computed, PropType, watch,
 } from 'vue';
 import {
   getSpecWithSerialNumber,
@@ -355,8 +389,13 @@ const resetLoading = (): void => {
   searchItemUser.value.isShowLoading = false;
   searchItemUser.value.isShowResult = false;
 };
-const currentOperate = ref<string>('');
 const store = useStore();
+const el = computed(() => store.getters.getCurrentElement);
+const assignEl = (e) : void => {
+  resetLoading();
+  if (el.value && el.value === e.target) return;
+  store.dispatch('assign_el', e.target);
+};
 const handleClick = (event) => {
   if (event.target.tagName.toLowerCase() === 'input') return;
   store.dispatch('assign_el', null);
@@ -369,9 +408,6 @@ const memberInfo = ref<Customer>(new Customer());
 
 /** @param {IProduct[]} productList 商品的搜尋結果 */
 const productList = reactive<IProductSpec[]>([]);
-const setCurrentOperate = (key) : void => {
-  currentOperate.value = key;
-};
 const searchProductErrorMessage = ref<string>('請掃描條碼或輸入商品名稱');
 /**
  * 產品搜索
@@ -509,11 +545,31 @@ const removeFromCart = (id: number) => {
     shoppingList.splice(index, 1);
   }
 };
-const usedEMoney = ref(0);
-const amountDiscount = ref(0);
-const percentageDiscount = ref(0);
-const usedBonus = ref(0);
-const payCash = ref(0);
+const orderVal = reactive({
+  totalPercentage: 0,
+  totalDiscount: 0,
+  totalEMoney: 0,
+  totalBonus: 0,
+  paidCash: 0,
+  taxNum: '',
+});
+const input = (e: InputEvent) : void => {
+  const target = e.target as HTMLInputElement;
+  if (e.isTrusted) return;
+  if (e.inputType === 'deleteContentBackward') {
+    orderVal[target.name] = `${orderVal[target.name]}`.slice(0, -1);
+    if (target.name === 'taxNum') return;
+    if (orderVal[target.name] === '') {
+      orderVal[target.name] = 0;
+    }
+    return;
+  }
+  if (orderVal[target.name]) {
+    orderVal[target.name] += e.data;
+    return;
+  }
+  orderVal[target.name] = e.data;
+};
 const shoppingItemTotal = computed(() => shoppingList.map(
   (order) => Math.round(
   order.price_per_unit * order.purchase_count
@@ -525,8 +581,8 @@ const totalBeforeDiscount = computed(
 );
 const orderTotal = computed(
   () => Math.round(
-    totalBeforeDiscount.value * (percentageDiscount.value / 100),
-  ) - amountDiscount.value - usedEMoney.value - usedBonus.value,
+    totalBeforeDiscount.value * (orderVal.totalPercentage / 100),
+  ) - orderVal.totalDiscount - orderVal.totalEMoney - orderVal.totalBonus,
 );
 const canUseBonus = computed(
   () => totalBeforeDiscount.value > memberInfo.value.emoney_denominator,
@@ -550,30 +606,48 @@ const checkAuthorization = () => {
       alert('取得權限失敗，請重新確認');
     });
 };
-const taxNumber = ref('');
 const payment = ref('');
 const resetData = () => {
   shoppingList.splice(0);
-  usedBonus.value = 0;
-  usedEMoney.value = 0;
-  percentageDiscount.value = 0;
-  amountDiscount.value = 0;
+  orderVal.totalBonus = 0;
+  orderVal.totalEMoney = 0;
+  orderVal.totalPercentage = 0;
+  orderVal.totalDiscount = 0;
   payment.value = '';
   memberInfo.value = new Customer();
-  taxNumber.value = '';
-  payCash.value = 0;
+  orderVal.taxNum = '';
+  orderVal.paidCash = 0;
   payment.value = '';
   isShowModal.value = false;
 };
+const [
+  totalPercentage,
+  totalDiscount,
+  totalEMoney,
+  totalBonus,
+  paidCash,
+  taxNum,
+] = [
+  ref<HTMLInputElement | null>(null),
+  ref<HTMLInputElement | null>(null),
+  ref<HTMLInputElement | null>(null),
+  ref<HTMLInputElement | null>(null),
+  ref<HTMLInputElement | null>(null),
+  ref<HTMLInputElement | null>(null),
+];
+watch(isShowModal, (val) => {
+  if (!val) return;
+  paidCash.value?.focus();
+});
 const createOrder = async () => {
   const apiData = {
     mobile: memberInfo.value.mobile,
-    used_e_money: usedEMoney.value,
-    used_bonus: usedBonus.value,
+    used_e_money: orderVal.totalEMoney,
+    used_bonus: orderVal.totalBonus,
     payment_method: payment.value,
-    tax_number: taxNumber.value,
-    percentage_discount: percentageDiscount.value || 100,
-    amount_discount: amountDiscount.value,
+    tax_number: orderVal.taxNum,
+    percentage_discount: orderVal.totalPercentage || 100,
+    amount_discount: orderVal.totalDiscount,
     auth_event_id: orderAuthorizedId.value,
     items: [...shoppingList],
   };
@@ -591,8 +665,8 @@ const confirmCancelOrder = () => {
   resetData();
 };
 const assignPayment = async (pay) => {
-  if (!payCash.value) {
-    payCash.value = orderTotal.value;
+  if (!orderVal.paidCash) {
+    orderVal.paidCash = orderTotal.value;
   }
   payment.value = pay;
   await createOrder();
