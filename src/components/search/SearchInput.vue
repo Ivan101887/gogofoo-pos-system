@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import {
-  PropType, reactive, watchEffect, defineProps, defineEmits,
+  PropType, reactive, watchEffect, defineProps, defineEmits, computed,
 } from 'vue';
 import { useStore } from 'vuex';
 import SearchList from './searchList.vue';
@@ -106,10 +106,10 @@ const input = (e) => {
 };
 const emit = defineEmits(['focus']);
 const store = useStore();
+const el = computed(() => store.getters.getCurrentElement);
 const assignEl = (e) => {
-  const target = store.getters.getCurrentElement;
   emit('focus', item.key);
-  if (target && target === e.target) return;
+  if (el.value && el.value === e.target) return;
   store.dispatch('assign_el', e.target);
 };
 const search = async () => {
@@ -124,6 +124,7 @@ const search = async () => {
   await props.fnSearch(item);
 };
 const searchOnEnter = async () => {
+  store.dispatch('assign_el', null);
   if (item.key === searchKey.product) return;
   await search();
 };

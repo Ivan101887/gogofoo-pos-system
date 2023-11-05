@@ -60,7 +60,6 @@ const simulateKeyUpEnter = (): void => {
   });
   if (el.value) {
     el.value.dispatchEvent(event);
-    store.dispatch('assign_el', null);
   }
 };
 </script>

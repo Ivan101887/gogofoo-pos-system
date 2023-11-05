@@ -10,10 +10,6 @@ const props = defineProps({
     type: Number,
     default: -1,
   },
-  searchKey: {
-    type: String,
-    default: '',
-  },
   /** @params {IShoppingItem} item - 商品 */
   item: {
     type: Object as PropType<IShoppingItem>,
@@ -29,7 +25,7 @@ const props = defineProps({
     default: 0,
   },
 });
-const emit = defineEmits(['removeItem', 'focus', 'nextLine']);
+const emit = defineEmits(['removeItem', 'focus', 'setLine']);
 // eslint-disable-next-line no-shadow
 enum editFieldName {
   discount = 'percentage_discount',
@@ -41,10 +37,12 @@ enum editFieldName {
 const store = useStore();
 const el = computed(() => store.getters.getCurrentElement);
 const assignEl = (e) => {
-  const target = store.getters.getCurrentElement;
   emit('focus');
-  emit('nextLine', props.index);
-  if (target && target === e.target) return;
+  const { now, index } = props;
+  if (now !== index) {
+    emit('setLine', props.index);
+  }
+  if (el.value && el.value === e.target) return;
   store.dispatch('assign_el', e.target);
 };
 const order = reactive(props.item);
@@ -106,7 +104,7 @@ const goNext = () => {
   const inputs = trInItem.value?.querySelectorAll('input.shoppingItem:not(disabled)');
   if (!inputs) return;
   if (inputs[inputs.length - 1] === el.value) {
-    emit('nextLine', props.index + 1);
+    emit('setLine', props.index + 1);
     return;
   }
   const idx = Array.from(inputs).findIndex((e) => e === el.value);
@@ -125,7 +123,7 @@ const goNext = () => {
           v-model="order[editFieldName.price]"
           class="shoppingItem text-lg p-2"
           :class="{
-            'active-input': `${now}-${el?.name}` === `${index}-${editFieldName.price}`
+            'active-input': now === index && el?.name === editFieldName.price
           }"
           min="0"
           :max="maxPrice"
@@ -145,7 +143,7 @@ const goNext = () => {
           v-model="order[editFieldName.count]"
           class="shoppingItem text-lg p-2"
           :class="{
-            'active-input': `${now}-${el?.name}` === `${index}-${editFieldName.count}`
+            'active-input': now === index && el?.name === editFieldName.count
           }"
           inputmode="none"
           min="1"
@@ -163,7 +161,7 @@ const goNext = () => {
           v-model="order[editFieldName.discount]"
           class="shoppingItem text-lg p-2"
           :class="{
-            'active-input': `${now}-${el?.name}` === `${index}-${editFieldName.discount}`
+            'active-input': now === index && el?.name === editFieldName.discount
           }"
           max="100"
           min="0"
@@ -183,7 +181,7 @@ const goNext = () => {
           v-model="order[editFieldName.coupon]"
           class="shoppingItem text-lg p-2"
           :class="{
-            'active-input': `${now}-${el?.name}` === `${index}-${editFieldName.coupon}`
+            'active-input': now === index && el?.name === editFieldName.coupon
           }"
           min="0"
           step="10"

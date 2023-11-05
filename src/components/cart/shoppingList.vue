@@ -56,7 +56,7 @@ const setNow = (index: number) : void => {
             :item="item"
             :now="now"
             :index="index"
-            @nextLine="setNow"
+            @setLine="setNow"
             @removeItem="removeItem"
           />
         </template>
