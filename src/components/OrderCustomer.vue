@@ -14,7 +14,7 @@
       </li>
       <li class="flex grow gap-2 justify-between">
         <div class="flex">
-          <span class="block">回饋金：</span>
+          <span class="block text-rose-600">現有回饋金：</span>
           <span class="block">{{ customer.e_money }}</span>
         </div>
         <p class="text-orange-500">
@@ -24,6 +24,12 @@
           <span class="px-2">{{ customer.emoney_numerator }}</span>
           元折扣）
         </p>
+      </li>
+      <li class="flex grow gap-2 justify-between">
+        <div class="flex">
+          <span class="block text-rose-600">現有獎金：</span>
+          <span class="block">{{ customer.sales_bonus || 0 }}</span>
+        </div>
       </li>
     </ul>
     <SearchUser v-bind="$attrs"/>
