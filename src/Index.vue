@@ -47,12 +47,12 @@ export default defineComponent({
       logout()
         .then(() => {
           message.value = '你已登出，請重新登入繼續使用';
-          isLogin.value = false;
-          localStorage.removeItem('user');
         })
         .catch((err) => {
           console.log(err);
         });
+      isLogin.value = false;
+      localStorage.removeItem('user');
     };
     /**
      * 登出
@@ -87,7 +87,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <Header :title="companyName" @logout="fnLogout" />
+  <Header :title="companyName" @logout="fnLogout" :user-name="userInfo.name" />
   <router-view :permission-list="userInfo.permissions"/>
   <Login v-if="!isLogin" :is-error="isError" :notice="message" @login="fnLogin" />
 </template>
