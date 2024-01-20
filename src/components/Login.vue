@@ -13,7 +13,7 @@
         </div>
         <div class="login__notice">{{ notice }}</div>
       </div>
-      <div class="login__body">
+      <form class="login__body" @submit.prevent="fnLogin" @keyup.enter.prevent="fnLogin">
         <div class="login__box">
           <label for="UserName" class="block login__label">帳號:</label>
           <input
@@ -23,7 +23,7 @@
             class="block login__input"
             placeholder="請輸入帳號以登入"
             v-model="loginInfo.username"
-            @keyup.enter.self="fnFocusNext('pwd')"
+            @keyup.enter.stop="fnFocusNext('pwd')"
           />
         </div>
         <div class="login__box">
@@ -46,14 +46,14 @@
             </option>
           </select>
         </div>
-      </div>
+      </form>
       <div class="login__foot">
         <button type="reset" class="login__btn btn btn-md btn-cancel">清除</button>
         <button
-          type="button"
+          type="submit"
           class="login__btn btn btn-md btn-success"
-          @click.self.prevent="fnLogin"
-        >
+          >
+          <!-- @click.self.prevent="fnLogin" -->
           登入
         </button>
       </div>
@@ -86,7 +86,7 @@ const storeList = reactive<{text: string, value: string}[]>([
   { text: '民族東路店', value: 'MZE' },
   { text: '台中店', value: 'TC' },
 ]);
-const selectedStore = ref<string>('');
+const selectedStore = ref<string>(storeList[0].text);
 const loginInfo = reactive<typeLoginInfo>({ username: '', password: '' });
 const fnLogin = ():void => {
   emit('login', loginInfo);

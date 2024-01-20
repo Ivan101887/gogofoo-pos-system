@@ -12,16 +12,19 @@
     </figure>
     <nav class="flex gap-1.5 text-white items-center">
       <router-link class="object-center" :to="{name: 'home'}">首頁</router-link> |
-      <router-link class="object-center" :to="{name: 'orders'}">訂單資訊</router-link>
+      <router-link class="object-center" :to="{name: 'orders'}">歷史訂單</router-link>
     </nav>
     <div class="header__btnGroup relative">
-      <button class="header__btn" @click="isShowOptions = !isShowOptions">
-        <font-awesome-icon
+      <button class="flex items-center gap-2" @click="isShowOptions = !isShowOptions">
+        <div class="header__btn ">
+          <font-awesome-icon
             class="login__icon"
             :icon="['fas', 'user']"
             size="lg"
             style="color: #4778cd;"
           />
+        </div>
+        <div class="text-white">歡迎，{{userName}}</div>
       </button>
       <ul
         v-show="isShowOptions"
@@ -41,6 +44,10 @@ export default defineComponent({
     title: {
       type: String,
       default: 'GOGOFOO',
+    },
+    userName: {
+      type: String,
+      default: '',
     },
   },
   emit: ['logout'],

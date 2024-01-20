@@ -45,7 +45,8 @@
           {'cashier__foot--modal': !shoppingList.length}
         ]
       ">
-        <label for="totalPercentage" class="flex gap-5 items-center basis-2/5 text-xl">
+        <label for="totalPercentage" class="flex gap-5 items-center basis-[45%] shrink-0
+        grow-1 text-xl">
           <p class="flex-auto">
             折扣:
           </p>
@@ -66,9 +67,10 @@
             @focus="assignEl"
           />
         </label>
-        <label for="totalDiscount" class="flex gap-5 items-center basis-2/5 text-xl">
+        <label for="totalDiscount" class="flex gap-5 items-center basis-[45%] shrink-0
+        grow-1 text-xl">
           <p class="flex-auto">
-            折價:
+            折抵:
           </p>
           <input
             type="number"
@@ -87,14 +89,14 @@
             @focus="assignEl"
           />
         </label>
-        <label for="totalEMoney" class="flex gap-5 items-center basis-2/5 text-xl">
+        <label for="totalEMoney" class="flex gap-5 items-center basis-[45%]
+        shrink-0 grow-1 text-xl">
           <p class="flex-auto">
             回饋金:
           </p>
           <input
             type="number"
             v-model="orderVal.totalEMoney"
-            max="100"
             min="0"
             step="10"
             ref="totalEMoney"
@@ -108,7 +110,7 @@
             @focus="assignEl"
           />
         </label>
-        <label for="totalBonus" class="flex gap-5 items-center basis-2/5 text-xl">
+        <label for="totalBonus" class="flex gap-5 items-center basis-[45%] shrink-0 grow-1 text-xl">
           <p class="flex-auto">
             購物金:
           </p>
@@ -116,7 +118,6 @@
             type="number"
             :disabled="!canUseBonus"
             v-model="orderVal.totalBonus"
-            max="100"
             min="0"
             step="10"
             ref="totalBonus"
@@ -169,8 +170,9 @@
         <div class="cashier__head relative m-2">
           <SearchInput
             :searchItem="searchItemUser"
-            placeholder="客戶編號"
+            placeholder="客戶手機號碼"
             :fn-search="apiHandler"
+            :max-length="10"
             @focus="resetLoading"
           >
             <template #prefix>
@@ -229,7 +231,7 @@
           <input
             v-model="orderVal.paidCash"
             name="paidCash"
-            placeholder="已付金額"
+            :placeholder="numberThousand(orderTotal)"
             type="number"
             min="0"
             :max="orderTotal"
@@ -250,7 +252,7 @@
           <input
             v-model="orderVal.taxNum"
             name="taxNum"
-            placeholder="輸入統編"
+            placeholder="統編八碼"
             type="text"
             ref="taxNum"
             :maxlength="8"
@@ -266,7 +268,13 @@
         <p class="text-5xl flex">
           找零:
           <span class="grow text-end">
-            {{ numberThousand(orderVal.paidCash > 0 ? orderTotal - orderVal.paidCash : 0) }}
+            {{
+              numberThousand(
+                parseInt(orderVal.paidCash as string, 10) as number > orderTotal
+                  ? parseInt(orderVal.paidCash as string, 10) as number - orderTotal
+                  : 0
+              )
+            }}
           </span>
         </p>
       </div>
@@ -548,12 +556,19 @@ const removeFromCart = (id: number) => {
     shoppingList.splice(index, 1);
   }
 };
-const orderVal = reactive({
+const orderVal = reactive<{
+  totalPercentage: number;
+  totalDiscount: number;
+  totalEMoney: number;
+  totalBonus: number;
+  paidCash: string;
+  taxNum: string;
+}>({
   totalPercentage: 0,
   totalDiscount: 0,
   totalEMoney: 0,
   totalBonus: 0,
-  paidCash: 0,
+  paidCash: '',
   taxNum: '',
 });
 const input = (e: InputEvent) : void => {
@@ -567,7 +582,7 @@ const input = (e: InputEvent) : void => {
     }
     return;
   }
-  if (orderVal[target.name]) {
+  if (orderVal[target.name] && parseInt(orderVal[target.name], 10)) {
     orderVal[target.name] += e.data;
     return;
   }
@@ -584,7 +599,7 @@ const totalBeforeDiscount = computed(
 );
 const orderTotal = computed(
   () => Math.round(
-    totalBeforeDiscount.value * (orderVal.totalPercentage / 100),
+    totalBeforeDiscount.value * ((orderVal.totalPercentage || 100) / 100),
   ) - orderVal.totalDiscount - orderVal.totalEMoney - orderVal.totalBonus,
 );
 const canUseBonus = computed(
@@ -619,7 +634,7 @@ const resetData = () => {
   payment.value = '';
   memberInfo.value = new Customer();
   orderVal.taxNum = '';
-  orderVal.paidCash = 0;
+  orderVal.paidCash = '';
   payment.value = '';
   isShowModal.value = false;
 };
@@ -654,22 +669,26 @@ const createOrder = async () => {
     auth_event_id: orderAuthorizedId.value,
     items: [...shoppingList],
   };
+  if (parseInt(orderVal.paidCash, 10) < orderTotal.value) {
+    orderVal.paidCash = orderTotal.value.toString();
+    alert('實際支付金額不能低於總金額喔!!');
+  }
   try {
-    const res = await createNewOrder(apiData);
-    window.alert(`成功建立訂單${res}`);
+    const res: {'order_url': string} = await createNewOrder(apiData);
+    window.alert(`成功建立訂單${res.order_url}`);
     resetData();
   } catch (e) {
     console.log(e);
   }
 };
 const confirmCancelOrder = () => {
-  const confirm = window.confirm('message');
+  const confirm = window.confirm('確定要清除現有訂單內容嗎?');
   if (!confirm) return;
   resetData();
 };
 const assignPayment = async (pay) => {
   if (!orderVal.paidCash) {
-    orderVal.paidCash = orderTotal.value;
+    orderVal.paidCash = (orderTotal.value).toString();
   }
   payment.value = pay;
   await createOrder();

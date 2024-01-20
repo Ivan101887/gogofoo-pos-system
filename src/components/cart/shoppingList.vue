@@ -43,8 +43,8 @@ const setNow = (index: number) : void => {
           <th class="p-2.5 text-lg font-semibold" width="25%">名稱</th>
           <th class="p-2.5 text-lg font-semibold" width="15%">售價<slot name="modify"></slot></th>
           <th class="p-2.5 text-lg font-semibold" width="12%">數量</th>
-          <th class="p-2.5 text-lg font-semibold" width="12%">打折</th>
-          <th class="p-2.5 text-lg font-semibold" width="15%">折扣金額</th>
+          <th class="p-2.5 text-lg font-semibold" width="12%">折扣</th>
+          <th class="p-2.5 text-lg font-semibold" width="15%">折抵</th>
           <th class="p-2.5 text-lg font-semibold" width="15%">小結</th>
           <th class="p-2.5 text-lg font-semibold" width="6%"></th>
         </tr>

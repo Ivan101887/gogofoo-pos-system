@@ -13,7 +13,7 @@
         <span class="block">{{ customer.mobile || '-' }}</span>
       </li>
       <li class="flex grow gap-2 justify-between">
-        <div class="flex">
+        <div class="flex shrink-0">
           <span class="block text-rose-600">現有回饋金：</span>
           <span class="block">{{ customer.e_money }}</span>
         </div>

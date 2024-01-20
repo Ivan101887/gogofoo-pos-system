@@ -18,6 +18,7 @@
       :class="[item.key === searchKey.user ? 'text-gray-500' : '']"
       type="text"
       v-model="item.value"
+      :maxlength="maxLength"
       :placeholder="placeholder"
       :inputmode="item.key === searchKey.user ? 'none' : 'text'"
       @input="input"
@@ -41,7 +42,6 @@ import {
   PropType, reactive, watchEffect, defineProps, defineEmits, computed,
 } from 'vue';
 import { useStore } from 'vuex';
-import SearchList from './searchList.vue';
 
 class Item {
   key = '';
@@ -85,6 +85,10 @@ const props = defineProps({
     type: Function,
     default: null,
   },
+  maxLength: {
+    type: Number,
+    default: undefined,
+  },
 });
 // eslint-disable-next-line no-shadow
 enum searchKey {
@@ -98,11 +102,12 @@ const input = (e) => {
     item.value = item.value.slice(0, -1);
     return;
   }
+  if (typeof e.data !== 'string') return;
   if (item.value) {
-    item.value += e.data;
+    item.value += e.data as string;
     return;
   }
-  item.value = e.data;
+  item.value = e.data as string;
 };
 const emit = defineEmits(['focus']);
 const store = useStore();
@@ -123,7 +128,8 @@ const search = async () => {
   item.isShowLoading = true;
   await props.fnSearch(item);
 };
-const searchOnEnter = async () => {
+const searchOnEnter = async (e) => {
+  console.log(e);
   store.dispatch('assign_el', null);
   if (item.key === searchKey.product) return;
   await search();

@@ -1,21 +1,19 @@
 <template>
   <div class="head">
     <h1 class="text-center text-4xl py-4 bg-sky-50 caret-transparent">歷史訂單</h1>
-    <div class="operate">
-        <downloadCsv
-          :data="orders"
-          :separator-excel="true"
-          :name="`${start} - ${end}訂單明細`"
-        >
-          <button class="teal button__custom">
-            <b>下載訂單明細</b>
-          </button>
-        </downloadCsv>
-      <div class="operate__timeSelector">
+    <div class="operate flex justify-between my-2 px-2 items-center">
+      <div class="operate__timeSelector flex gap-2 items-center">
         <label for="start">
-          <input type="date" v-model="start" name="start" />
+          <span>
+            開始時間：
+          </span>
+          <input type="date" inputmode="none" v-model="start" name="start" :max="end" />
         </label>
+        <span>～</span>
         <label for="end">
+          <span>
+            結束時間：
+          </span>
           <input
             type="date"
             name="end"
@@ -24,11 +22,26 @@
             :max="new Date().toISOString().slice(0, 10)"
           />
         </label>
-        <button type="button" @click="getOrderList">確定</button>
+        <button type="button"
+          @click="fetchDataFromDate"
+          class=" btn bg-cyan-500 teal button__custom text-white px-2 py-1"
+        >
+          確定
+        </button>
       </div>
+      <downloadCsv
+        v-if="!!orders.length"
+        :data="orders"
+        :separator-excel="true"
+        :name="`${start} - ${end}訂單明細`"
+      >
+        <button class=" btn bg-cyan-500 teal button__custom text-white px-2 py-1">
+          <b>下載訂單明細</b>
+        </button>
+      </downloadCsv>
     </div>
   </div>
-  <section class="body orderTable mb-2 h-[83vh] overflow-y-auto">
+  <section class="body orderTable mb-2 h-[76vh] overflow-y-auto">
     <OrderList class="caret-transparent" :order-list="orders" />
   </section>
   <div class="foot">
@@ -84,6 +97,10 @@ export default defineComponent({
       orders.push(...res.items);
       totalOrders.value = res.count;
     };
+    const fetchDataFromDate = async () => {
+      orders.splice(0);
+      await getOrderList();
+    };
     watch(nowPage, async () => {
       await getOrderList();
     });
@@ -98,6 +115,7 @@ export default defineComponent({
       pageNum,
       start,
       end,
+      fetchDataFromDate,
     };
   },
   components: { OrderList },

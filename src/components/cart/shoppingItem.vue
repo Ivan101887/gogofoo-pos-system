@@ -76,7 +76,7 @@ watch(order, (b, a) => {
       break;
     case editFieldName.discount:
       if (!(a[el.value.name] <= discountBase && a[el.value.name] > 0)) {
-        alert('打折請輸入0-100之間');
+        alert('折扣請輸入0-100之間');
         order[el.value.name] = b[el.value.name];
       }
       break;
@@ -110,6 +110,12 @@ const goNext = () => {
   const idx = Array.from(inputs).findIndex((e) => e === el.value);
   if (idx === -1) return;
   (inputs[idx + 1]as HTMLInputElement).focus();
+};
+const confirmRemoveItem = () => {
+  const confirm = window.confirm(`確定要刪除品項: ${order.product_name}嗎?`);
+  if (confirm) {
+    emit('removeItem', order.id);
+  }
 };
 </script>
 <template>
@@ -194,7 +200,7 @@ const goNext = () => {
     </td>
     <td align="center" width="15%">{{ total }}</td>
     <td align="center" width="5%">
-      <button class="btn" @click="emit('removeItem', order.id)">
+      <button class="btn" @click="confirmRemoveItem">
         <font-awesome-icon :icon="['fas', 'trash-can']" size="xl" class="text-rose-700" />
       </button>
     </td>
