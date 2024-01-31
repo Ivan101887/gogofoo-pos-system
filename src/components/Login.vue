@@ -46,17 +46,17 @@
             </option>
           </select>
         </div>
-      </form>
-      <div class="login__foot">
-        <button type="reset" class="login__btn btn btn-md btn-cancel">清除</button>
-        <button
-          type="submit"
-          class="login__btn btn btn-md btn-success"
+        <div class="login__foot text-center">
+          <button type="reset" class="login__btn btn btn-md btn-cancel">清除</button>
+          <button
+            type="submit"
+            class="login__btn btn btn-md btn-success"
+            @click.self.prevent="fnLogin"
           >
-          <!-- @click.self.prevent="fnLogin" -->
-          登入
-        </button>
-      </div>
+            登入
+          </button>
+        </div>
+      </form>
     </form>
   </div>
 </template>
