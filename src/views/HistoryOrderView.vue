@@ -29,16 +29,6 @@
           確定
         </button>
       </div>
-      <downloadCsv
-        v-if="!!orders.length"
-        :data="orders"
-        :separator-excel="true"
-        :name="`${start} - ${end}訂單明細`"
-      >
-        <button class=" btn bg-cyan-500 teal button__custom text-white px-2 py-1">
-          <b>下載訂單明細</b>
-        </button>
-      </downloadCsv>
     </div>
   </div>
   <section class="body orderTable mb-2 h-[76vh] overflow-y-auto">

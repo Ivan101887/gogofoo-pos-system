@@ -86,6 +86,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <template>
   <Header :title="companyName" @logout="fnLogout" :user-name="userInfo.name" />
   <router-view :permission-list="userInfo.permissions"/>
